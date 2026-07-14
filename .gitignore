@@ -1,0 +1,19 @@
+# WAT Framework temp files
+.tmp/
+
+# Environment variables & secrets
+.env
+.env.local
+
+# Google OAuth tokens & credentials
+credentials.json
+token.json
+
+# Python cache & virtual environment
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+.pytest_cache/
+.DS_Store

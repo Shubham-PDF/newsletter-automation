@@ -1,0 +1,36 @@
+name: Daily Technical Newsletter
+
+on:
+  schedule:
+    # 6:00 AM UTC. Adjust this value to target your local timezone.
+    # E.g., for IST (UTC+5:30) at 6:00 AM, use: 30 0 * * *
+    # E.g., for EST (UTC-5) at 6:00 AM, use: 0 11 * * *
+    - cron: '0 6 * * *'
+  workflow_dispatch: # Allows manual trigger from GitHub UI
+
+jobs:
+  run-newsletter:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run Newsletter Pipeline
+      env:
+        PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
+        RECIPIENT_EMAIL: ${{ secrets.RECIPIENT_EMAIL }}
+        GMAIL_SMTP_EMAIL: ${{ secrets.GMAIL_SMTP_EMAIL }}
+        GMAIL_SMTP_PASSWORD: ${{ secrets.GMAIL_SMTP_PASSWORD }}
+      run: python run_newsletter.py
