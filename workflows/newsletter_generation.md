@@ -1,57 +1,68 @@
-# Workflow: Daily AI & Systems Newsletter
+# Workflow: Daily BUILDR.ai Technical Briefing
 
 This Standard Operating Procedure (SOP) outlines the execution protocol for generating and dispatching the daily technical newsletter.
 
 ## Objective
-To deliver a high-signal, custom-curated, and visually stunning newsletter summarizing the latest news, research, and technical blogs in:
-1. Artificial Intelligence / Machine Learning
-2. Computer Networks
-3. Computer Systems Design & Architecture
+To deliver a high-signal, developer-centric newsletter structured into 5 core sections:
+1. Launches (Models, Tools, APIs, Products)
+2. Prompting & Technique (Practical Patterns)
+3. Head to Head (Comparisons & Tradeoffs)
+4. Tech Shifts (Infrastructure & Platform Changes)
+5. Repo Radar (Featured Open-Source GitHub Repositories)
 
 ## Schedule
-*   **Trigger Time**: Exactly 6:00 AM daily (configured via CI/CD trigger / GitHub Actions).
+*   **Trigger Time**: Exactly 02:30 UTC daily (08:00 AM IST) via GitHub Actions workflow (`daily_newsletter.yml`).
 
 ## Required Inputs & Environment
-Ensure the following variables are configured in the `.env` file or environment:
+Ensure the following variables are configured in `.env` or GitHub Secrets:
 - `PERPLEXITY_API_KEY`: API Key for Perplexity AI.
-- `RECIPIENT_EMAIL`: Recipient Gmail address.
-- `GMAIL_SMTP_EMAIL`: Sender email address (if using SMTP).
-- `GMAIL_SMTP_PASSWORD`: Sender App Password (if using SMTP).
+- `RECIPIENT_EMAIL`: Single email address or comma-separated list of recipients.
+- `GMAIL_SMTP_EMAIL`: Sender email address for SMTP.
+- `GMAIL_SMTP_PASSWORD`: Sender App Password for SMTP.
+- `GITHUB_TOKEN`: Provided automatically in GitHub Actions for GitHub REST API authentication.
 
 ## Execution Sequence
 
 ```mermaid
 graph TD
-    A[Start] --> B[Fetch Raw Tech News tools/fetch_news.py]
-    B --> C[AI Relevance Filter & Synthesis tools/ai_research.py]
-    C --> D[Generate Premium HTML Template tools/generate_html.py]
-    D --> E[Dispatch Email to Recipient tools/send_email.py]
-    E --> F[End]
+    A[Start] --> B[Fetch News Feeds tools/fetch_news.py]
+    B --> C[Fetch Repo Candidates tools/fetch_repos.py]
+    C --> D[AI Relevance Filter & Synthesis tools/ai_research.py]
+    D --> E[Generate Premium HTML Template tools/generate_html.py]
+    E --> F{Is Dry Run?}
+    F -- Yes --> G[Print Preview HTML Path]
+    F -- No --> H[Dispatch Email to Recipients tools/send_email.py]
+    H --> I[Commit History & End]
 ```
 
-### 1. Raw Information Retrieval
+### 1. Raw News Retrieval
 *   **Script**: `tools/fetch_news.py`
-*   **Function**: Queries Hacker News top/new items, arXiv CS feeds, and key RSS endpoints.
-*   **Output**: Saves `raw_news.json` in the `.tmp/` directory.
+*   **Function**: Queries Hacker News (top, new, show) and curated AI/tooling RSS feeds.
+*   **Output**: Saves `raw_news.json` in `.tmp/`.
 
-### 2. AI Synthesis and Filtering
+### 2. GitHub Repository Candidate Retrieval
+*   **Script**: `tools/fetch_repos.py`
+*   **Function**: Queries GitHub REST Search API for trending AI/LLM repos and devtools, excluding repos featured within the last 60 days.
+*   **Output**: Saves `raw_repos.json` in `.tmp/`.
+
+### 3. AI Synthesis & Filtering
 *   **Script**: `tools/ai_research.py`
-*   **Function**: Uses Perplexity API to evaluate relevance. Parses top articles, summaries, and writes technical deep-dives ("What it is", "Technical Deep-Dive", and "Why It Matters").
-*   **Output**: Saves `synthesized_news.json` in the `.tmp/` directory.
+*   **Function**: Uses Perplexity API (`sonar`) with structured `json_schema` to synthesize candidates across the 5 sections. Validates repo data and updates `history/featured_repos.json` and `history/featured_articles.json`.
+*   **Output**: Saves `synthesized_news.json` in `.tmp/`.
 
-### 3. HTML Rendering
+### 4. HTML Rendering
 *   **Script**: `tools/generate_html.py`
-*   **Function**: Generates inline CSS responsive table structure formatted for Gmail.
-*   **Output**: Saves `newsletter.html` in the `.tmp/` directory.
+*   **Function**: Generates responsive table structure formatted for Gmail and Outlook, skipping empty sections.
+*   **Output**: Saves `newsletter.html` in `.tmp/`.
 
-### 4. Dispatch
+### 5. Dispatch / Dry-Run
 *   **Script**: `tools/send_email.py`
-*   **Function**: Authenticates via Gmail SMTP (or Gmail API) and transmits the HTML payload.
+*   **Function**: Authenticates via Gmail SMTP and transmits HTML payload to all envelope recipients (To: sender). Exits non-zero if synthesized JSON contains zero items.
 
 ---
 
 ## Error Handling & Troubleshooting
 
-*   **API Rate Limit / Failure**: If the Perplexity API request fails, wait 30 seconds and retry. If it fails continuously, send a fallback email notifying the user of the pipeline delay.
-*   **Empty Raw Feed**: If no articles are fetched (network error/API offline), log an error and attempt to fallback to top Hacker News general items.
-*   **Authentication Issues**: Ensure your Google App Password is a 16-character string generated for Gmail, not your main account password.
+*   **API Failure / Empty Response**: If Perplexity API fails or returns zero items, `ai_research.py` exits with status code 1. The pipeline halts immediately and no email is sent.
+*   **Missing Credentials**: Missing `PERPLEXITY_API_KEY`, `RECIPIENT_EMAIL`, or SMTP credentials will cause the respective tool to print a critical error and exit non-zero.
+*   **Dry-Run Mode**: Passing `--dry-run` to `run_newsletter.py` generates `.tmp/newsletter.html` without triggering `send_email.py`.
