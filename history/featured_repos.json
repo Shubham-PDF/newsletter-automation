@@ -230,5 +230,21 @@
   {
     "full_name": "fastlane/fastlane",
     "date": "2026-08-01"
+  },
+  {
+    "full_name": "KunAgent/Kun",
+    "date": "2026-08-02"
+  },
+  {
+    "full_name": "ongridio/ongrid",
+    "date": "2026-08-02"
+  },
+  {
+    "full_name": "khoj-ai/khoj",
+    "date": "2026-08-02"
+  },
+  {
+    "full_name": "junegunn/fzf",
+    "date": "2026-08-02"
   }
 ]
