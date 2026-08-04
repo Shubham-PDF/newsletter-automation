@@ -490,5 +490,37 @@
   {
     "url": "https://github.com/Stirling-Tools/Stirling-PDF/pkgs/container/stirling-pdf",
     "date": "2026-08-03"
+  },
+  {
+    "url": "https://openai.com/index/continuous-voice-interaction-with-gpt-live",
+    "date": "2026-08-04"
+  },
+  {
+    "url": "https://blog.cloudflare.com/smaller-faster-safer-models/",
+    "date": "2026-08-04"
+  },
+  {
+    "url": "https://blog.comfy.org/p/minimax-h3-day-0-support-in-comfyui",
+    "date": "2026-08-04"
+  },
+  {
+    "url": "https://openai.com/index/ten-advances-in-mathematics/",
+    "date": "2026-08-04"
+  },
+  {
+    "url": "https://www.seangoedecke.com/llms-reward-expertise/",
+    "date": "2026-08-04"
+  },
+  {
+    "url": "https://ankursethi.com/blog/prevent-cognitive-debt-by-manually-retyping-llm-generated-code/",
+    "date": "2026-08-04"
+  },
+  {
+    "url": "https://blog.exe.dev/devtools-must-be-open-source",
+    "date": "2026-08-04"
+  },
+  {
+    "url": "https://techcrunch.com/2026/08/03/a-marc-benioff-backed-startup-thinks-ai-can-solve-the-ai-deployment-problem/",
+    "date": "2026-08-04"
   }
 ]

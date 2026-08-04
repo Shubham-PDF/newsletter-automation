@@ -262,5 +262,21 @@
   {
     "full_name": "files-community/Files",
     "date": "2026-08-03"
+  },
+  {
+    "full_name": "rpamis/comet",
+    "date": "2026-08-04"
+  },
+  {
+    "full_name": "Kritt-ai/open-kritt",
+    "date": "2026-08-04"
+  },
+  {
+    "full_name": "aipoch/open-science",
+    "date": "2026-08-04"
+  },
+  {
+    "full_name": "ohmyzsh/ohmyzsh",
+    "date": "2026-08-04"
   }
 ]
