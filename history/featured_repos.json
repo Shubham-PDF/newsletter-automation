@@ -278,5 +278,21 @@
   {
     "full_name": "ohmyzsh/ohmyzsh",
     "date": "2026-08-04"
+  },
+  {
+    "full_name": "google-gemini/gemini-cli",
+    "date": "2026-08-05"
+  },
+  {
+    "full_name": "go-gitea/gitea",
+    "date": "2026-08-05"
+  },
+  {
+    "full_name": "langgenius/dify",
+    "date": "2026-08-05"
+  },
+  {
+    "full_name": "sherlock-project/sherlock",
+    "date": "2026-08-05"
   }
 ]
