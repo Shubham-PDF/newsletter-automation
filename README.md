@@ -1,109 +1,87 @@
 # BUILDR.ai Daily Tech Briefing Compiler
 
-`BUILDR.ai` is an automated, real-time technical news compilation and delivery engine designed specifically for software developers, systems engineers, and technology builders. 
+`BUILDR.ai` is an automated, real-time technical news collection, deduplication, ranking, and AI synthesis engine built for software developers, AI automation engineers, and solution architects.
 
-Every day, the system parses high-signal technical sources, uses search-grounded AI compilation to analyze and synthesize the findings into five structured developer sections, and dispatches a clean, brand-grade HTML email directly to your inbox.
-
----
-
-##  Why BUILDR.ai is Different
-
-Most technical newsletters are either hand-curated (lagging behind) or fully automated RSS dumps (resulting in low-signal noise, duplicate items, and ads). 
-
-`BUILDR.ai` bridges this gap with 5 focused sections:
-
-1. **Launches** — New AI models, tools, products, APIs, and notable version releases with explicit developer task breakdowns.
-2. **Prompting & Technique** — Practical, applicable techniques for getting better results out of models (concrete patterns, not theory).
-3. **Head to Head** — Comparisons between models or tools: benchmarks, pricing, context limits, real-world tradeoffs, and "use X when Y" guidance.
-4. **Tech Shifts** — Broader changes worth knowing about: infrastructure, deprecations, pricing moves, and regulation with practical developer impact.
-5. **Repo Radar** — High-signal open-source developer repositories and CLI tools fetched directly via the GitHub REST API, complete with star counts, language tags, real-world use cases, and getting started commands.
-
-### Core Architecture Features
-- **Search-Grounded AI Synthesis**: Leverages the **Perplexity API (`sonar`)** to conduct real-time web searches alongside parsed feeds, verifying facts and pulling in breaking news from the last 24 hours.
-- **GitHub REST Search & Repo Radar**: Automatically queries trending AI/LLM repos and developer productivity tools, enforcing a 60-day history exclusion window (`history/featured_repos.json`).
-- **Strict Error Safety**: Fails non-zero immediately on missing API keys, network failures, or empty responses, preventing blank emails from ever being dispatched.
-- **No Hallucinated Links**: Copies exact, verified URLs and repository star counts—no broken links or fabricated metadata.
-- **Multi-Recipient Support**: Supports single or comma-separated email lists in `RECIPIENT_EMAIL` with envelope dispatch so recipients do not see each other's addresses.
-- **Developer-First Typography & Aesthetic**: Built with inline CSS table layouts for Gmail and Outlook compatibility, featuring **Plus Jakarta Sans** and **JetBrains Mono**.
+Every day, the pipeline ingests raw technical feeds, web searches, and model API snapshots, enforces strict recency and factual deduplication in Python, synthesizes high-signal insights via a Two-Stage LLM architecture (Editor -> Writer), and dispatches a brand-grade HTML briefing.
 
 ---
 
-##  Project Structure
+## Key Architecture & Features
 
-Following a structured, modular design:
-*   `.github/workflows/`: Contains the daily Cron automation configurations (`30 2 * * *` = 08:00 AM IST) for GitHub Actions.
-*   `tools/`: Python scripts executing deterministic actions (`fetch_news.py`, `fetch_repos.py`, `ai_research.py`, `generate_html.py`, `send_email.py`).
-*   `history/`: Tracks previously featured repositories (`featured_repos.json`) and article URLs (`featured_articles.json`) to prevent repeats.
-*   `workflows/`: Standard operating procedures and execution sequence outlines.
-*   `.tmp/`: Gitignored local folder used during pipeline runs to store intermediate outputs (`raw_news.json`, `raw_repos.json`, `synthesized_news.json`, `newsletter.html`).
+1. **Deterministic Python Fact Layer**:
+   - **Shared Item Contract (`tools/common.py`)**: All data sources normalize to a strict `Item` schema.
+   - **Strict 30-Hour Recency Window**: Timezone-aware date parsing (`parse_dt`) rejects stale dates, future dates, and unparseable timestamps.
+   - **Multi-Factor Ranking Formula**: Composite scoring balances keyword relevance, recency decay (`exp(-age/12)`), source authority, and cluster size.
+   - **Jaccard Title Clustering (>= 0.55)**: Collapses near-duplicate headlines across tech press feeds into representative clusters.
+
+2. **Source Registry & Verification (`sources.yaml` / `tools/verify_sources.py`)**:
+   - Data collection is entirely driven by `sources.yaml`.
+   - `verify_sources.py` validates all feeds, outputting `docs/source_health.md` and disabling non-200/empty endpoints.
+
+3. **Repo Radar with Star Velocity & Quality Filters (`tools/fetch_repos.py`)**:
+   - Quality filters reject null licenses, null languages, stale pushes (>30d), abnormal star ratios, and `NAME_BLOCK` patterns (`awesome-`, `interview`, `tutorial`).
+   - Automated regex extraction of `install_hint` directly from repository READMEs.
+   - 7-day star velocity ranking (`store.star_velocity`) tracks fast-growing repositories.
+
+4. **Two-Stage AI Synthesis & Factual Grounding (`tools/ai_research.py`)**:
+   - **Stage 1 (Editor Call)**: Evaluates top 60 candidate metadata rows and selects ~12-15 items across 5 sections.
+   - **Enrichment**: Trafilatura fetches full article content ONLY for selected items, capping text at 700 words and re-verifying publication dates from article metadata.
+   - **Stage 2 (Writer Call)**: Generates developer prose without receiving URLs, dates, or source names.
+   - **Hydration (`ID_MAP`)**: Python hydrates exact URLs, titles, and sources back onto LLM output, enforcing zero cross-section duplicates and zero hallucinated URLs.
+
+5. **SQLite-over-JSONL Persistence Layer (`tools/db.py`)**:
+   - SQLite is rebuilt in memory at run start from `history/*.jsonl` files, ensuring diffable git history while providing full SQL query power.
+   - TTL pruning automatically expires items at 30 days and featured items at 365 days.
 
 ---
 
-## Quick Start (Local Setup)
+## Project Structure
 
-To test and run the project locally, follow these steps:
+```
+├── sources.yaml               # Source registry (RSS, Algolia, OpenRouter, HF, GitHub)
+├── docs/
+│   └── source_health.md       # Automated source health report
+├── history/
+│   ├── items.jsonl            # Ingested item deduplication log (30-day TTL)
+│   ├── featured.jsonl         # Newsletter featured items log (365-day TTL)
+│   ├── repo_stars.jsonl       # Repo star snapshot log (120-day TTL)
+│   └── runs.jsonl             # Pipeline execution telemetry manifest
+├── prompts/
+│   ├── editor_system.txt      # Stage 1 Editor role prompt
+│   ├── editor_user.txt        # Stage 1 Candidate selection template
+│   ├── writer_system.txt      # Stage 2 Writer role prompt
+│   └── writer_user.txt        # Stage 2 Section synthesis template
+├── tools/
+│   ├── common.py              # Shared dataclasses, date parser, relevance scorer, HTTP client
+│   ├── db.py                  # SQLite-over-JSONL Store implementation
+│   ├── verify_sources.py      # Source endpoint health verifier
+│   ├── fetch_news.py          # Stages 1-5 Collection, Filtering, Clustering & Ranking
+│   ├── fetch_repos.py         # GitHub Repo Radar with star velocity & install hint extraction
+│   ├── fetch_tavily.py        # Tavily live web search collector (15 vertical queries)
+│   ├── fetch_perplexity.py    # Perplexity sonar citation URL extractor
+│   ├── ai_research.py         # Two-stage AI synthesis & ID_MAP hydration engine
+│   ├── generate_html.py       # HTML template compiler
+│   └── send_email.py          # Email SMTP dispatcher
+├── tests/                     # Pytest suite covering WP-1 through WP-9
+├── run_newsletter.py          # Pipeline orchestration script
+└── requirements.txt           # Python dependency pins
+```
 
-### 1. Clone & Set Up Virtual Environment
-Initialize your local Python environment:
+---
+
+## Quick Start (Local Execution)
+
 ```bash
-# Clone the repository and navigate to it
-cd Newsletter
-
-# Create a virtual environment
-python3 -m venv .venv
-
-# Activate the virtual environment
+# 1. Activate Virtual Environment & Install Dependencies
 source .venv/bin/activate
-
-# Install the required dependencies
 pip install -r requirements.txt
-```
 
-### 2. Configure Environment Variables
-Create a `.env` file in the root directory:
-```env
-# Perplexity API Key for live search synthesis
-PERPLEXITY_API_KEY=your_perplexity_api_key_here
+# 2. Run Test Suite
+PYTHONPATH=. pytest tests/
 
-# Recipient Email Config (supports single or comma-separated list)
-RECIPIENT_EMAIL=recipient1@gmail.com, recipient2@gmail.com
+# 3. Verify Source Health
+python tools/verify_sources.py
 
-# SMTP Gmail Config
-GMAIL_SMTP_EMAIL=your_sender_gmail@gmail.com
-GMAIL_SMTP_PASSWORD=your_16_character_app_password
-
-# (Optional locally) GitHub Personal Access Token for higher API rate limits
-GITHUB_TOKEN=your_github_token_here
-```
-> **Note**: The `GMAIL_SMTP_PASSWORD` must be a **16-character App Password** generated under your Google Account Security settings.
-
-### 3. Run the Pipeline
-Run the orchestrator command:
-```bash
-# Runs the full compile pipeline and sends the email
-python run_newsletter.py
-
-# Run in dry-run mode (safely builds newsletter.html in .tmp/ without sending email)
+# 4. Execute Full Pipeline (Dry-Run Mode)
 python run_newsletter.py --dry-run
 ```
-
----
-
-## Getting the Newsletter Everyday (Automated Deployment)
-
-You can set up `BUILDR.ai` to run completely for free every morning using GitHub Actions.
-
-### 1. Push to GitHub
-Push this repository to your private or public GitHub account.
-
-### 2. Add Repository Secrets
-On GitHub, go to your repository **Settings** > **Secrets and variables** > **Actions** and add the following secrets:
-*   `PERPLEXITY_API_KEY`
-*   `RECIPIENT_EMAIL` (single address or comma-separated list)
-*   `GMAIL_SMTP_EMAIL`
-*   `GMAIL_SMTP_PASSWORD`
-
-> **Note**: GitHub automatically provides `GITHUB_TOKEN` to the workflow with no manual setup needed.
-
-### 3. Done!
-The workflow is configured in [.github/workflows/daily_newsletter.yml](file:///.github/workflows/daily_newsletter.yml) to execute every morning at **02:30 UTC (08:00 AM IST)** and automatically commit featured repository history back to the repo.

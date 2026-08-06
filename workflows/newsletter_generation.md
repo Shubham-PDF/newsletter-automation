@@ -3,19 +3,21 @@
 This Standard Operating Procedure (SOP) outlines the execution protocol for generating and dispatching the daily technical newsletter.
 
 ## Objective
-To deliver a high-signal, developer-centric newsletter structured into 5 core sections:
-1. Launches (Models, Tools, APIs, Products)
-2. Prompting & Technique (Practical Patterns)
-3. Head to Head (Comparisons & Tradeoffs)
-4. Tech Shifts (Infrastructure & Platform Changes)
-5. Repo Radar (Featured Open-Source GitHub Repositories)
+To deliver a high-signal, developer and AI consultant newsletter structured into 5 core sections:
+1. Launches & AI Tools (with Automation Engineer Use Cases)
+2. Business AI in Action & Industry Solutions (Real Estate, Healthcare, Legal, Finance case studies)
+3. AI Friction & Crisis Watch (Solvable bottlenecks, operational failures, and automation fixes)
+4. Head to Head & Task Matrix (Task-based model selection guidance)
+5. Automation Repo Radar (Featured Open-Source GitHub Repositories)
 
 ## Schedule
-*   **Trigger Time**: Exactly 02:30 UTC daily (08:00 AM IST) via GitHub Actions workflow (`daily_newsletter.yml`).
+*   **Daily Trigger Time**: 21:23 UTC daily (`23 21 * * *` in `daily_newsletter.yml`), offset ~5 hours earlier to absorb runner queue delays and dispatch by ~08:00 AM IST.
+*   **Weekly Cleanup Schedule**: 00:00 UTC every Sunday (`0 0 * * 0` in `weekly_cleanup.yml`) to reset `history/featured_articles.json` while keeping `history/featured_repos.json` intact.
 
 ## Required Inputs & Environment
 Ensure the following variables are configured in `.env` or GitHub Secrets:
 - `PERPLEXITY_API_KEY`: API Key for Perplexity AI.
+- `TAVILY_API_KEY`: (Optional) API Key for Tavily Live Web Search.
 - `RECIPIENT_EMAIL`: Single email address or comma-separated list of recipients.
 - `GMAIL_SMTP_EMAIL`: Sender email address for SMTP.
 - `GMAIL_SMTP_PASSWORD`: Sender App Password for SMTP.
@@ -26,13 +28,14 @@ Ensure the following variables are configured in `.env` or GitHub Secrets:
 ```mermaid
 graph TD
     A[Start] --> B[Fetch News Feeds tools/fetch_news.py]
-    B --> C[Fetch Repo Candidates tools/fetch_repos.py]
-    C --> D[AI Relevance Filter & Synthesis tools/ai_research.py]
-    D --> E[Generate Premium HTML Template tools/generate_html.py]
-    E --> F{Is Dry Run?}
-    F -- Yes --> G[Print Preview HTML Path]
-    F -- No --> H[Dispatch Email to Recipients tools/send_email.py]
-    H --> I[Commit History & End]
+    B --> C[Fetch Live Business Search tools/fetch_tavily.py]
+    C --> D[Fetch Repo Candidates tools/fetch_repos.py]
+    D --> E[Load Prompt Template & AI Synthesis tools/ai_research.py]
+    E --> F[Generate Premium HTML Template tools/generate_html.py]
+    F --> G{Is Dry Run?}
+    G -- Yes --> H[Print Preview HTML Path]
+    G -- No --> I[Dispatch Email to Recipients tools/send_email.py]
+    I --> J[Commit History & End]
 ```
 
 ### 1. Raw News Retrieval

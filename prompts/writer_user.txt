@@ -1,0 +1,15 @@
+Write the newsletter sections for the selected items below based strictly on the provided text.
+
+FOR EACH SECTION:
+1. "adoption_signal": Provide `title`, `metrics_summary`, and `what_it_means_for_builders` (technical interpretation of the download movement).
+2. "wave_incoming": Provide `title`, `signal_summary`, `confidence` ("confirmed" | "preview" | "unconfirmed"), and `developer_preparation`.
+3. "client_signals": Provide `title`, `what_they_need` (company, vertical, problem in own framing), and `your_angle` (concrete build that solves it, stack, buyer role).
+4. "launches": Provide `title`, `what_it_is`, `details`, `why_it_matters`, and `automation_use_case`.
+5. "crisis_watch": Provide `title`, `company_or_sector`, `crisis_summary`, `impact_on_business`, and `automation_fix` (specific to this exact incident).
+6. "head_to_head": Provide `title`, `contenders` (list of strings), `verdict`, `use_when`, and `task_matrix`.
+7. "repo_radar": Provide `full_name`, `what_it_does`, `daily_use_case`, and `getting_started`.
+
+IMPORTANT: Each entry MUST include the exact `id` string provided in the input.
+
+SELECTED CANDIDATES:
+{enriched_candidates_json}

@@ -1,9 +1,9 @@
 # BUILDR.ai Source Health Report
 
-**Generated at**: `2026-08-06 10:34 UTC`
-- **Total Enabled Sources Tested**: 42
-- **Healthy Sources (≥1 entry & HTTP 200)**: 32 (76.2%)
-- **Disabled Sources**: 10
+**Generated at**: `2026-08-06 11:11 UTC`
+- **Total Enabled Sources Tested**: 32
+- **Healthy Sources (≥1 entry & HTTP 200)**: 32 (100.0%)
+- **Disabled Sources**: 0
 
 ## Verified Source Status Table
 
@@ -22,20 +22,16 @@
 | Interconnects | `rss` | 200 | 20 | 2 | ✅ Healthy | OK |
 | Latent Space | `rss` | 200 | 20 | 8 | ✅ Healthy | OK |
 | Import AI | `rss` | 200 | 20 | 1 | ✅ Healthy | OK |
-| The Batch (DeepLearning.AI) | `rss` | 404 | 0 | 0 | ❌ Disabled | HTTP 404 |
 | Techmeme | `rss` | 200 | 15 | 15 | ✅ Healthy | OK |
 | InfoQ AI & ML | `rss` | 200 | 13 | 10 | ✅ Healthy | OK |
 | Hacker News | `hn_algolia` | 200 | 30 | 30 | ✅ Healthy | OK |
 | TechCrunch AI | `rss` | 200 | 20 | 20 | ✅ Healthy | OK |
 | VentureBeat AI | `rss` | 200 | 7 | 0 | ✅ Healthy | OK |
 | The Verge AI | `rss` | 200 | 10 | 10 | ✅ Healthy | OK |
-| Ars Technica AI | `rss` | 200 | 20 | 19 | ✅ Healthy | OK |
+| Ars Technica AI | `rss` | 200 | 20 | 20 | ✅ Healthy | OK |
 | MarkTechPost | `rss` | 200 | 10 | 10 | ✅ Healthy | OK |
-| Healthcare IT News | `rss` | 403 | 0 | 0 | ❌ Disabled | HTTP 403 |
 | Fierce Healthcare | `rss` | 200 | 25 | 24 | ✅ Healthy | OK |
 | Finextra | `rss` | 200 | 54 | 46 | ✅ Healthy | OK |
-| American Banker | `rss` | 200 | 0 | 0 | ❌ Disabled | Parsed 0 entries from RSS feed |
-| Inman | `rss` | 403 | 0 | 0 | ❌ Disabled | HTTP 403 |
 | HousingWire | `rss` | 200 | 10 | 10 | ✅ Healthy | OK |
 | Artificial Lawyer | `rss` | 200 | 10 | 6 | ✅ Healthy | OK |
 | Legal IT Insider | `rss` | 200 | 8 | 8 | ✅ Healthy | OK |
@@ -44,10 +40,4 @@
 | Manufacturing Dive | `rss` | 200 | 10 | 10 | ✅ Healthy | OK |
 | CIO Dive | `rss` | 200 | 10 | 10 | ✅ Healthy | OK |
 | OpenAI Status | `rss` | 200 | 95 | 6 | ✅ Healthy | OK |
-| Anthropic Status | `rss` | 200 | 25 | 10 | ✅ Healthy | OK |
-| Azure Status | `rss` | 200 | 0 | 0 | ❌ Disabled | Parsed 0 entries from RSS feed |
-| r/LocalLLaMA | `reddit` | 403 | 0 | 0 | ❌ Disabled | HTTP 403 |
-| r/AI_Agents | `reddit` | 403 | 0 | 0 | ❌ Disabled | HTTP 403 |
-| r/n8n | `reddit` | 403 | 0 | 0 | ❌ Disabled | HTTP 403 |
-| r/msp | `reddit` | 403 | 0 | 0 | ❌ Disabled | HTTP 403 |
-| The Register AI | `rss` | 200 | 0 | 0 | ❌ Disabled | Parsed 0 entries from RSS feed |
+| Anthropic Status | `rss` | 200 | 25 | 9 | ✅ Healthy | OK |

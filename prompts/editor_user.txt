@@ -1,0 +1,25 @@
+Review the candidate table below and select the top items for today's issue of BUILDR.ai.
+
+CRITICAL ROUTING RULE: You may ONLY assign a candidate ID to a section listed in its "Eligible Sections" bracket. Assigning a candidate to an ineligible section is strictly forbidden.
+
+AVAILABLE SECTIONS:
+- "adoption_signal": Package download spikes and software adoption metrics.
+- "wave_incoming": Early signals, model weight drops, cloaked models, and previews.
+- "client_signals": Businesses actively hiring or looking for AI automation solutions.
+- "launches": Newly shipped developer tools, APIs, frameworks, and model releases.
+- "crisis_watch": Verified production outages, security breaches, hallucinations, and incident failures.
+- "head_to_head": Model or tool benchmark and price comparisons.
+- "repo_radar": Open-source developer repositories selected ONLY from GitHub search repos.
+
+Output JSON format:
+{
+  "selections": [
+    {"id": "<candidate_id>", "section": "<eligible_section_name>"}
+  ]
+}
+
+CANDIDATES TABLE:
+{candidates_table}
+
+REPOSITORY CANDIDATES:
+{repo_candidates_table}

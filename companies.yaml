@@ -1,0 +1,42 @@
+# BUILDR.ai Target Client Companies Registry
+# Drives tools/fetch_client_signals.py for job board polling
+
+- name: Stripe
+  board_type: greenhouse
+  token: stripe
+  vertical: finance
+
+- name: Figma
+  board_type: greenhouse
+  token: figma
+  vertical: devtools
+
+- name: Airbnb
+  board_type: greenhouse
+  token: airbnb
+  vertical: real_estate
+
+- name: Databricks
+  board_type: greenhouse
+  token: databricks
+  vertical: devtools
+
+- name: Linear
+  board_type: ashby
+  token: linear
+  vertical: devtools
+
+- name: Brex
+  board_type: greenhouse
+  token: brex
+  vertical: finance
+
+- name: Robinhood
+  board_type: greenhouse
+  token: robinhood
+  vertical: finance
+
+- name: DoorDash
+  board_type: greenhouse
+  token: doordash
+  vertical: ecommerce

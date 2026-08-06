@@ -22,8 +22,30 @@ logger = logging.getLogger(__name__)
 
 VALID_SOURCE_TYPES = {
     "rss", "hn_algolia", "gh_releases", "openrouter",
-    "hf_api", "reddit", "sitemap"
+    "hf_api", "reddit", "sitemap", "gh_search", "tavily", "perplexity",
+    "job_board", "hn_hiring", "freelance", "pkg_stats", "benchmark",
+    "vendor_blog", "status_page", "cve"
 }
+
+ALL_VALID_SECTIONS = {"launches", "business", "crisis", "headtohead", "repo_radar"}
+
+SECTION_ELIGIBILITY = {
+    "gh_search":   {"repo_radar"},                                  # HARD
+    "gh_releases": {"launches"},
+    "rss":         {"launches", "business", "crisis", "headtohead"},
+    "hn_algolia":  {"launches", "crisis", "headtohead"},
+    "status_page": {"crisis"},
+    "openrouter":  {"launches", "headtohead"},
+    "hf_api":      {"launches"},
+    "tavily":      {"business", "crisis"},
+    "perplexity":  {"business", "crisis"},
+}
+
+# Startup assertion: raise on mismatch
+for stype, secs in SECTION_ELIGIBILITY.items():
+    for sec in secs:
+        if sec not in ALL_VALID_SECTIONS:
+            raise ValueError(f"Startup assertion failed: section '{sec}' for source_type '{stype}' does not exist in pipeline section config {ALL_VALID_SECTIONS}")
 
 @dataclass
 class Item:
@@ -34,6 +56,7 @@ class Item:
     source: str
     published_at: Optional[str]  # ISO 8601 string or None
     first_seen: str
+    source_type: str = ""
     score: float = 0.0
     summary: str = ""
     full_text: str = ""
@@ -57,6 +80,7 @@ class Item:
             "source": self.source,
             "published_at": self.published_at,
             "first_seen": self.first_seen,
+            "source_type": self.source_type,
             "score": self.score,
             "summary": self.summary,
             "full_text": self.full_text,
@@ -145,10 +169,19 @@ def within_window(dt: Optional[datetime], max_hours: int = 30) -> Tuple[bool, st
 
 
 # Regex word boundary pattern tables compiled at module load
+TIER1_MODELS_RE = re.compile(
+    r"\b(chatgpt|gpt-?\d\w*|gpt|claude|gemini|llama|mistral|qwen|deepseek|"
+    r"grok|copilot|cursor|codex|sora|whisper|o[1-9]\d?)\b",
+    re.IGNORECASE
+)
+
+TIER2_VENDORS_RE = re.compile(
+    r"\b(openai|anthropic|deepmind|hugging ?face|perplexity ai|xai|cohere)\b",
+    re.IGNORECASE
+)
+
 POSITIVE_HIGH = [
-    r'\bllm\b', r'\bllms\b', r'\bgpt-?\d*\b', r'\bclaude\b', r'\bgemini\b',
-    r'\bllama\b', r'\bmistral\b', r'\bdeepseek\b', r'\bqwen\b', r'\bvllm\b',
-    r'\bsglang\b', r'\bollama\b', r'\blitellm\b'
+    r'\bllm\b', r'\bllms\b', r'\bvllm\b', r'\bsglang\b', r'\bollama\b', r'\blitellm\b'
 ]
 
 POSITIVE_MED = [
@@ -188,6 +221,11 @@ def relevance_score(title: str, summary: str = "") -> float:
         return 0.0
 
     score = 0.0
+    if TIER1_MODELS_RE.search(text):
+        score += 3.0
+    if TIER2_VENDORS_RE.search(text):
+        score += 2.0
+
     for r in _HIGH_RE:
         if r.search(text):
             score += 3.0

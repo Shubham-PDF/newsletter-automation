@@ -2,24 +2,23 @@
 """
 tools/fetch_news.py
 
-Stages 1–3 of the collection pipeline:
-- Stage 1: Collect from enabled sources in sources.yaml by type
-  (rss, hn_algolia, gh_releases, openrouter, hf_api, reddit, sitemap).
+Full Collection, Filtering, Clustering, and Ranking Pipeline:
+- Stage 1: Collect from enabled sources in sources.yaml by type.
 - Stage 2: Normalize to Item dataclass and parse publish dates safely.
-- Stage 3: Strict filtering sequence:
-  1. Window check (within_window 30h)
-  2. Was-featured check (store.was_featured 30d)
-  3. Relevance score check (score >= 3.0)
-  4. In-run and DB duplicate check (store.is_duplicate)
+- Stage 3: Strict filtering sequence (window 30h, was_featured 30d, relevance score >= 3.0, dedupe).
+- Stage 4: Clustering via title token set Jaccard similarity (>= 0.55).
+- Stage 5: Multi-factor composite ranking.
 """
 
 import os
 import sys
 import json
+import math
+import re
 import asyncio
 import logging
 from datetime import datetime, timezone, timedelta
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Set
 import httpx
 import feedparser
 import xml.etree.ElementTree as ET
@@ -48,11 +47,24 @@ HEADERS = {
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 BUILDR.ai/2.0"
 }
 
+WEIGHTS = {
+    "keyword_score": 0.35,
+    "recency": 0.25,
+    "source_weight": 0.20,
+    "cluster_size": 0.15,
+    "hn_points": 0.05,
+    "persona_score": 0.00
+}
+
+STOPWORDS = {
+    "a", "an", "the", "in", "on", "of", "and", "or", "for", "with", "to", "is", "at",
+    "by", "from", "up", "about", "into", "over", "after", "how", "why", "what", "which"
+}
+
 
 # ---------- COLLECTORS BY TYPE ----------
 
 def _extract_rss_body(entry: dict) -> str:
-    """Reads content:encoded or full content first, falling back to summary/description."""
     contents = entry.get("content", [])
     if contents and isinstance(contents, list):
         for c in contents:
@@ -96,8 +108,10 @@ async def collect_hn_algolia(client: httpx.AsyncClient, source: dict) -> List[di
     min_points = source.get("min_points", 20)
     raw_items = []
 
+    cutoff_ts = int((datetime.now(timezone.utc) - timedelta(hours=30)).timestamp())
+
     for q in queries:
-        url = f"https://hn.algolia.com/api/v1/search_by_date?tags=story&numericFilters=points>={min_points}"
+        url = f"https://hn.algolia.com/api/v1/search_by_date?tags=story&hitsPerPage=100&numericFilters=points>={min_points},created_at_i>{cutoff_ts}"
         if q:
             url += f"&query={q}"
 
@@ -137,7 +151,6 @@ async def collect_gh_releases(client: httpx.AsyncClient, source: dict) -> List[d
         feed = feedparser.parse(resp.content)
         for entry in feed.entries:
             title = entry.get("title") or ""
-            # Skip prereleases (rc, beta, alpha, dev)
             if any(term in title.lower() for term in ["rc", "beta", "alpha", "dev", "pre-release"]):
                 continue
 
@@ -178,7 +191,6 @@ async def collect_openrouter(client: httpx.AsyncClient, source: dict) -> List[di
 
     raw_items = []
     if prev_snapshot:
-        # Detect new models
         for mid, mobj in curr_snapshot.items():
             if mid not in prev_snapshot:
                 name = mobj.get("name", mid)
@@ -191,7 +203,6 @@ async def collect_openrouter(client: httpx.AsyncClient, source: dict) -> List[di
                     "raw": mobj
                 })
     else:
-        # First run: snapshot current top models
         for mobj in models[:5]:
             mid = mobj.get("id")
             name = mobj.get("name", mid)
@@ -203,7 +214,6 @@ async def collect_openrouter(client: httpx.AsyncClient, source: dict) -> List[di
                 "raw": mobj
             })
 
-    # Save current snapshot
     with open(OPENROUTER_SNAPSHOT_FILE, "w", encoding="utf-8") as f:
         json.dump(curr_snapshot, f, indent=2)
 
@@ -317,7 +327,7 @@ async def collect_sitemap(client: httpx.AsyncClient, source: dict) -> List[dict]
 async def collect_source(client: httpx.AsyncClient, source: dict, manifest: Manifest) -> List[dict]:
     name = source.get("name")
     stype = source.get("type")
-    
+
     try:
         if stype == "rss":
             return await collect_rss(client, source)
@@ -343,11 +353,12 @@ async def collect_source(client: httpx.AsyncClient, source: dict, manifest: Mani
 
 # ---------- PIPELINE STAGES 1–3 ----------
 
-async def fetch_and_filter_news(store: Store, manifest: Manifest) -> List[Item]:
+async def fetch_and_filter_news(store: Store, manifest: Manifest) -> tuple[List[Item], Dict[str, dict]]:
     sources = load_sources(SOURCES_PATH)
+    sources_map = {s["name"]: s for s in sources}
     logger.info(f"Loaded {len(sources)} enabled sources from {SOURCES_PATH}")
 
-    all_raw: List[tuple[dict, dict]] = []  # (raw_item, source_config)
+    all_raw: List[tuple[dict, dict]] = []
 
     async with httpx.AsyncClient(http2=True, verify=False) as client:
         tasks = [collect_source(client, src, manifest) for src in sources]
@@ -377,28 +388,23 @@ async def fetch_and_filter_news(store: Store, manifest: Manifest) -> List[Item]:
         c_url = canonical_url(raw_url)
         iid = item_id(raw_url)
 
-        # Stage 2: Date parsing
         pub_raw = raw_item.get("published_raw")
         dt = parse_dt(pub_raw)
 
-        # Stage 3.1: Recency window check (30 hours)
         ok, reason = within_window(dt, max_hours=30)
         if not ok:
             manifest.record_rejection(source_name, reason)
             continue
 
-        # Stage 3.2: Was-featured check (30 days)
         if store.was_featured(raw_url, days=30):
             manifest.record_rejection(source_name, "was_featured")
             continue
 
-        # Stage 3.3: Relevance score check (threshold 3.0, unless weight >= 0.9)
         title = raw_item.get("title", "")
         summary = raw_item.get("summary", "")
         source_weight = float(src.get("weight", 0.6))
-        
+
         score = relevance_score(title, summary)
-        # Apply small weight bonus for high-authority sources
         if source_weight >= 0.9:
             score += 1.5
 
@@ -406,14 +412,12 @@ async def fetch_and_filter_news(store: Store, manifest: Manifest) -> List[Item]:
             manifest.record_rejection(source_name, "low_score")
             continue
 
-        # Stage 3.4: In-run and DB duplicate check
         if iid in seen_in_run_ids or store.is_duplicate(raw_url):
             manifest.record_rejection(source_name, "duplicate")
             continue
 
         seen_in_run_ids.add(iid)
 
-        # Construct Item dataclass
         item = Item(
             id=iid,
             canonical=c_url,
@@ -422,6 +426,7 @@ async def fetch_and_filter_news(store: Store, manifest: Manifest) -> List[Item]:
             source=source_name,
             published_at=dt.isoformat() if dt else None,
             first_seen=now_iso,
+            source_type=src.get("type", "rss"),
             score=score,
             summary=summary[:1000],
             section_hint=src.get("section_hint", ""),
@@ -431,27 +436,139 @@ async def fetch_and_filter_news(store: Store, manifest: Manifest) -> List[Item]:
             raw=raw_item.get("raw", {})
         )
 
-        # Record candidate in DB
         store.record_candidate(item.to_dict())
         manifest.record_collected(source_name)
         filtered_items.append(item)
 
     logger.info(f"Items passing stages 1–3 filters: {len(filtered_items)}")
-    return filtered_items
+    return filtered_items, sources_map
+
+
+# ---------- STAGE 4: CLUSTERING (Jaccard token sets >= 0.55) ----------
+
+def _title_tokens(title: str) -> Set[str]:
+    # Normalize version strings like v0.7 -> 0.7
+    t_clean = re.sub(r'\bv(\d)', r'\1', title.lower())
+    clean = re.sub(r'[^\w\s\.]', ' ', t_clean)
+    tokens = {t.strip('.') for t in clean.split() if t.strip('.') and t not in STOPWORDS and len(t) > 1}
+    return tokens
+
+
+def _jaccard_similarity(set_a: Set[str], set_b: Set[str]) -> float:
+    if not set_a or not set_b:
+        return 0.0
+    union_len = len(set_a | set_b)
+    if union_len == 0:
+        return 0.0
+    return len(set_a & set_b) / union_len
+
+
+class UnionFind:
+    def __init__(self, n: int):
+        self.parent = list(range(n))
+
+    def find(self, i: int) -> int:
+        if self.parent[i] == i:
+            return i
+        self.parent[i] = self.find(self.parent[i])
+        return self.parent[i]
+
+    def union(self, i: int, j: int):
+        root_i = self.find(i)
+        root_j = self.find(j)
+        if root_i != root_j:
+            self.parent[root_i] = root_j
+
+
+def cluster_items(items: List[Item], sources_map: Dict[str, dict], threshold: float = 0.55) -> List[Item]:
+    if not items:
+        return []
+
+    n = len(items)
+    uf = UnionFind(n)
+    token_sets = [_title_tokens(it.title) for it in items]
+
+    for i in range(n):
+        for j in range(i + 1, n):
+            sim = _jaccard_similarity(token_sets[i], token_sets[j])
+            if sim >= threshold:
+                uf.union(i, j)
+
+    groups: Dict[int, List[int]] = {}
+    for i in range(n):
+        root = uf.find(i)
+        groups.setdefault(root, []).append(i)
+
+    clustered_representatives: List[Item] = []
+
+    for root, member_indices in groups.items():
+        members = [items[idx] for idx in member_indices]
+        # Pick representative: highest source_weight, tie-break earliest published_at
+        members.sort(key=lambda it: (
+            float(sources_map.get(it.source, {}).get("weight", 0.6)),
+            -(parse_dt(it.published_at).timestamp() if parse_dt(it.published_at) else 0)
+        ), reverse=True)
+
+        rep = members[0]
+        rep.cluster_size = len(members)
+        rep.also_covered_by = [m.url for m in members[1:]]
+        clustered_representatives.append(rep)
+
+    logger.info(f"Clustered {len(items)} items down to {len(clustered_representatives)} representative clusters.")
+    return clustered_representatives
+
+
+# ---------- STAGE 5: COMPOSITE RANKING ----------
+
+def rank_items(items: List[Item], sources_map: Dict[str, dict]) -> List[Item]:
+    if not items:
+        return []
+
+    now_dt = datetime.now(timezone.utc)
+    max_kscore = max((it.score for it in items), default=1.0)
+    max_cluster = max((it.cluster_size for it in items), default=1)
+    max_hn = max((it.hn_points for it in items), default=1)
+
+    for it in items:
+        norm_kscore = it.score / max(max_kscore, 1.0)
+
+        dt = parse_dt(it.published_at)
+        age_hours = (now_dt - dt).total_seconds() / 3600.0 if dt else 12.0
+        recency = math.exp(-max(0.0, age_hours) / 12.0)
+
+        src_weight = float(sources_map.get(it.source, {}).get("weight", 0.6))
+        norm_cluster = it.cluster_size / max(max_cluster, 1)
+        norm_hn = it.hn_points / max(max_hn, 1)
+
+        comp_score = (
+            WEIGHTS["keyword_score"] * norm_kscore +
+            WEIGHTS["recency"] * recency +
+            WEIGHTS["source_weight"] * src_weight +
+            WEIGHTS["cluster_size"] * norm_cluster +
+            WEIGHTS["hn_points"] * norm_hn +
+            WEIGHTS["persona_score"] * 0.0
+        )
+        it.score = round(comp_score, 4)
+
+    items.sort(key=lambda it: it.score, reverse=True)
+    return items
 
 
 def main():
     store = Store()
     manifest = Manifest()
-    items = asyncio.run(fetch_and_filter_news(store, manifest))
 
-    # Save outputs
-    out_dicts = [it.to_dict() for it in items]
+    raw_filtered_items, sources_map = asyncio.run(fetch_and_filter_news(store, manifest))
+    clustered_items = cluster_items(raw_filtered_items, sources_map)
+    ranked_items = rank_items(clustered_items, sources_map)
+
+    out_dicts = [it.to_dict() for it in ranked_items]
     with open(RAW_NEWS_FILE, "w", encoding="utf-8") as f:
         json.dump(out_dicts, f, indent=2, ensure_ascii=False)
 
     store.save()
-    print(f"Saved {len(items)} filtered items to {RAW_NEWS_FILE}")
+    print(f"Saved {len(ranked_items)} ranked representative items to {RAW_NEWS_FILE}")
+
 
 if __name__ == "__main__":
     main()

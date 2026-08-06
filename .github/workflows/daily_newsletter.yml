@@ -2,9 +2,13 @@ name: Daily Technical Newsletter
 
 on:
   schedule:
-    # 2:30 AM UTC (02:30 UTC = 8:00 AM IST)
-    - cron: '30 2 * * *'
+    # 21:23 UTC daily (~5 hours earlier to absorb runner queue delays and deliver by ~08:00 AM IST)
+    - cron: '23 21 * * *'
   workflow_dispatch: # Allows manual trigger from GitHub UI
+
+concurrency:
+  group: buildr-newsletter
+  cancel-in-progress: false
 
 jobs:
   run-newsletter:
@@ -15,6 +19,8 @@ jobs:
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
     - name: Set up Python
       uses: actions/setup-python@v5
@@ -30,18 +36,22 @@ jobs:
     - name: Run Newsletter Pipeline
       env:
         PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
+        TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
         RECIPIENT_EMAIL: ${{ secrets.RECIPIENT_EMAIL }}
         GMAIL_SMTP_EMAIL: ${{ secrets.GMAIL_SMTP_EMAIL }}
         GMAIL_SMTP_PASSWORD: ${{ secrets.GMAIL_SMTP_PASSWORD }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: python run_newsletter.py
 
-    - name: Commit and Push History
+    - name: Commit and Push History JSONL
       if: always()
       run: |
         git config user.name "github-actions[bot]"
         git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-        git add history/
-        git diff --staged --quiet || git commit -m "chore: update featured repo history [skip ci]"
-        git push
+        git add history/*.jsonl sources.yaml docs/
+        git diff --staged --quiet || (git pull --rebase --autostash && git commit -m "chore: update newsletter history and observability logs [skip ci]" && git push)
 
+    - name: Notify on Pipeline Failure
+      if: failure()
+      run: |
+        echo "Pipeline run failed. Check Action execution logs."

@@ -20,9 +20,9 @@ def test_surviving_items_validity():
     store = Store()
     manifest = Manifest()
     
-    # Run fetch_and_filter_news
+    # Run fetch_and_filter_news (returns tuple (items, sources_map))
     import asyncio
-    items = asyncio.run(fetch_and_filter_news(store, manifest))
+    items, sources_map = asyncio.run(fetch_and_filter_news(store, manifest))
     
     for item in items:
         assert item.id != ""
