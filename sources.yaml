@@ -1,0 +1,399 @@
+# BUILDR.ai source registry
+#
+# Every collector is driven by this file. Adding a source = adding a block here,
+# never editing Python.
+#
+# FIELDS
+#   name          Display name. Must be unique — used as the manifest key.
+#   type          rss | hn_algolia | gh_releases | openrouter | hf_api | reddit | sitemap
+#   url           Endpoint. Ignored for types that build their own URL.
+#   weight        0.0-1.0 source authority. Feeds the ranking formula.
+#                 1.0  = first-party announcement (vendor blog, release feed)
+#                 0.8  = high-quality independent analysis
+#                 0.6  = tech press / aggregator
+#                 0.4  = high-noise, needs the score threshold to earn its place
+#   section_hint  launches | business | crisis | headtohead | learning
+#                 A hint for the editor LLM, NOT a hard assignment.
+#   vertical      Optional. real_estate | healthcare | finance | legal | ecommerce |
+#                 manufacturing | retail | supply_chain
+#   enabled       false to park a source without deleting it.
+#   notes         Free text.
+#
+# VERIFY BEFORE TRUSTING
+#   These URLs were written from prior knowledge and feed endpoints move.
+#   Run `python tools/verify_sources.py` before the first real run and after any
+#   edit. Anything returning non-200 or zero parsed entries gets enabled: false
+#   with a note, not a silent zero in your candidate pool.
+
+# ---------------------------------------------------------------------------
+# LAUNCHES — first-party. Highest weight because there is no press lag and no
+# interpretation layer between the announcement and you.
+# ---------------------------------------------------------------------------
+
+- name: OpenAI News
+  type: rss
+  url: https://openai.com/news/rss.xml
+  weight: 1.0
+  section_hint: launches
+
+- name: Hugging Face Blog
+  type: rss
+  url: https://huggingface.co/blog/feed.xml
+  weight: 0.9
+  section_hint: launches
+
+- name: AWS What's New
+  type: rss
+  url: https://aws.amazon.com/about-aws/whats-new/recent/feed/
+  weight: 0.9
+  section_hint: launches
+  notes: Very high volume. Relies on the score threshold to filter to AI/ML items.
+
+- name: Google Cloud Release Notes
+  type: rss
+  url: https://cloud.google.com/feeds/gcp-release-notes.xml
+  weight: 0.9
+  section_hint: launches
+
+- name: Microsoft Azure AI Blog
+  type: rss
+  url: https://azure.microsoft.com/en-us/blog/feed/
+  weight: 0.8
+  section_hint: launches
+
+- name: Google Research Blog
+  type: rss
+  url: https://research.google/blog/rss/
+  weight: 0.8
+  section_hint: learning
+
+- name: OpenRouter Model Diff
+  type: openrouter
+  url: https://openrouter.ai/api/v1/models
+  weight: 1.0
+  section_hint: headtohead
+  notes: >
+    Snapshot daily, diff against yesterday. Emits synthetic items for new model
+    IDs, price changes, and context-window changes. Cheapest high-signal source
+    in the stack and the factual base for head_to_head.
+
+- name: Hugging Face Trending Models
+  type: hf_api
+  url: https://huggingface.co/api/models?sort=likes7d&direction=-1&limit=30
+  weight: 0.8
+  section_hint: launches
+
+- name: Hugging Face Daily Papers
+  type: rss
+  url: https://jamesg.blog/hf-papers.xml
+  weight: 0.7
+  section_hint: learning
+  enabled: false
+  notes: Third-party mirror of the HF papers page. Verify it still resolves.
+
+# --- GitHub release feeds. type gh_releases builds the .atom URL per repo. ---
+
+- name: GitHub Releases Watchlist
+  type: gh_releases
+  weight: 1.0
+  section_hint: launches
+  repos:
+    # orchestration / agents
+    - langchain-ai/langchain
+    - langchain-ai/langgraph
+    - run-llama/llama_index
+    - crewAIInc/crewAI
+    - pydantic/pydantic-ai
+    - microsoft/autogen
+    - openai/openai-agents-python
+    # serving / inference
+    - vllm-project/vllm
+    - ollama/ollama
+    - sgl-project/sglang
+    - BerriAI/litellm
+    - huggingface/text-generation-inference
+    # RAG / retrieval / vector
+    - infiniflow/ragflow
+    - chroma-core/chroma
+    - qdrant/qdrant
+    - weaviate/weaviate
+    # protocol / tooling
+    - modelcontextprotocol/servers
+    - modelcontextprotocol/python-sdk
+    - stanfordnlp/dspy
+    - unslothai/unsloth
+    # automation platforms — your delivery stack
+    - n8n-io/n8n
+    - temporalio/temporal
+    - PostHog/posthog
+    - apache/airflow
+    # observability / eval
+    - langfuse/langfuse
+    - Arize-ai/phoenix
+    - confident-ai/deepeval
+
+# ---------------------------------------------------------------------------
+# ANALYSIS & LEARNING — interpretation, not announcement. Useful for your own
+# growth track and for head_to_head framing.
+# ---------------------------------------------------------------------------
+
+- name: Simon Willison Weblog
+  type: rss
+  url: https://simonwillison.net/atom/entries/
+  weight: 0.9
+  section_hint: learning
+
+- name: Interconnects
+  type: rss
+  url: https://www.interconnects.ai/feed
+  weight: 0.8
+  section_hint: learning
+
+- name: Latent Space
+  type: rss
+  url: https://www.latent.space/feed
+  weight: 0.8
+  section_hint: learning
+
+- name: Import AI
+  type: rss
+  url: https://importai.substack.com/feed
+  weight: 0.8
+  section_hint: learning
+
+- name: The Batch (DeepLearning.AI)
+  type: rss
+  url: https://www.deeplearning.ai/the-batch/feed/
+  weight: 0.7
+  section_hint: learning
+
+- name: Techmeme
+  type: rss
+  url: https://www.techmeme.com/feed.xml
+  weight: 0.7
+  section_hint: launches
+  notes: >
+    Techmeme clusters stories itself, so it doubles as a free importance oracle.
+    If an item you already have also appears here, apply a +1.0 rank bonus.
+
+- name: InfoQ AI & ML
+  type: rss
+  url: https://feed.infoq.com/ai-ml-data-eng/news/
+  weight: 0.7
+  section_hint: launches
+
+- name: Hacker News
+  type: hn_algolia
+  weight: 0.7
+  section_hint: launches
+  queries:
+    - ""            # front page by recency, points-gated
+    - "llm"
+    - "agents"
+    - "rag"
+    - "mcp"
+    - "fine-tuning"
+  min_points: 20
+
+# ---------------------------------------------------------------------------
+# TECH PRESS — broad coverage, high noise. Kept at low weight deliberately.
+# ---------------------------------------------------------------------------
+
+- name: TechCrunch AI
+  type: rss
+  url: https://techcrunch.com/category/artificial-intelligence/feed/
+  weight: 0.6
+  section_hint: launches
+
+- name: VentureBeat AI
+  type: rss
+  url: https://venturebeat.com/category/ai/feed/
+  weight: 0.6
+  section_hint: launches
+
+- name: The Verge AI
+  type: rss
+  url: https://www.theverge.com/rss/ai-artificial-intelligence/index.xml
+  weight: 0.6
+  section_hint: launches
+
+- name: Ars Technica AI
+  type: rss
+  url: https://arstechnica.com/ai/feed/
+  weight: 0.6
+  section_hint: crisis
+
+- name: MarkTechPost
+  type: rss
+  url: https://www.marktechpost.com/feed/
+  weight: 0.4
+  section_hint: launches
+  notes: High volume, low editorial filter. Needs a hard score threshold.
+
+# ---------------------------------------------------------------------------
+# BUSINESS AI IN ACTION — vertical trade press. This section CANNOT be sourced
+# from tech press, which is why it is currently the hardest for the LLM to fill.
+# ---------------------------------------------------------------------------
+
+- name: Healthcare IT News
+  type: rss
+  url: https://www.healthcareitnews.com/home/feed
+  weight: 0.8
+  section_hint: business
+  vertical: healthcare
+
+- name: Fierce Healthcare
+  type: rss
+  url: https://www.fiercehealthcare.com/rss/xml
+  weight: 0.7
+  section_hint: business
+  vertical: healthcare
+
+- name: Finextra
+  type: rss
+  url: https://www.finextra.com/rss/headlines.aspx
+  weight: 0.8
+  section_hint: business
+  vertical: finance
+
+- name: American Banker
+  type: rss
+  url: https://www.americanbanker.com/feed
+  weight: 0.7
+  section_hint: business
+  vertical: finance
+
+- name: Inman
+  type: rss
+  url: https://www.inman.com/feed/
+  weight: 0.8
+  section_hint: business
+  vertical: real_estate
+
+- name: HousingWire
+  type: rss
+  url: https://www.housingwire.com/feed/
+  weight: 0.7
+  section_hint: business
+  vertical: real_estate
+
+- name: Artificial Lawyer
+  type: rss
+  url: https://www.artificiallawyer.com/feed/
+  weight: 0.8
+  section_hint: business
+  vertical: legal
+
+- name: Legal IT Insider
+  type: rss
+  url: https://legaltechnology.com/feed/
+  weight: 0.7
+  section_hint: business
+  vertical: legal
+
+- name: Modern Retail
+  type: rss
+  url: https://www.modernretail.co/feed/
+  weight: 0.7
+  section_hint: business
+  vertical: ecommerce
+
+- name: Supply Chain Dive
+  type: rss
+  url: https://www.supplychaindive.com/feeds/news/
+  weight: 0.7
+  section_hint: business
+  vertical: supply_chain
+
+- name: Manufacturing Dive
+  type: rss
+  url: https://www.manufacturingdive.com/feeds/news/
+  weight: 0.7
+  section_hint: business
+  vertical: manufacturing
+
+- name: CIO Dive
+  type: rss
+  url: https://www.ciodive.com/feeds/news/
+  weight: 0.7
+  section_hint: business
+
+# --- Vendor customer-story pages. Poll the sitemap, emit newly-seen URLs. ---
+# These are literally "Company X deployed AI to solve Y, here are the numbers" —
+# the exact artifact the solution_opportunity field needs.
+
+- name: Google Cloud Customer Stories
+  type: sitemap
+  url: https://cloud.google.com/sitemap.xml
+  path_filter: "/customers/"
+  weight: 0.8
+  section_hint: business
+  enabled: false
+  notes: Enable once sitemap parsing is implemented and the path filter verified.
+
+- name: Databricks Customer Stories
+  type: sitemap
+  url: https://www.databricks.com/sitemap.xml
+  path_filter: "/customers/"
+  weight: 0.8
+  section_hint: business
+  enabled: false
+
+# ---------------------------------------------------------------------------
+# CRISIS WATCH — failure modes. Your consulting leads live here.
+# ---------------------------------------------------------------------------
+
+- name: OpenAI Status
+  type: rss
+  url: https://status.openai.com/history.rss
+  weight: 1.0
+  section_hint: crisis
+
+- name: Anthropic Status
+  type: rss
+  url: https://status.anthropic.com/history.rss
+  weight: 1.0
+  section_hint: crisis
+
+- name: Azure Status
+  type: rss
+  url: https://azurestatuscdn.azureedge.net/en-us/status/feed/
+  weight: 0.8
+  section_hint: crisis
+
+- name: r/LocalLLaMA
+  type: reddit
+  url: https://www.reddit.com/r/LocalLLaMA/new.json?limit=50
+  weight: 0.7
+  section_hint: crisis
+  min_score: 15
+
+- name: r/AI_Agents
+  type: reddit
+  url: https://www.reddit.com/r/AI_Agents/new.json?limit=50
+  weight: 0.7
+  section_hint: crisis
+  min_score: 10
+
+- name: r/n8n
+  type: reddit
+  url: https://www.reddit.com/r/n8n/new.json?limit=50
+  weight: 0.7
+  section_hint: crisis
+  min_score: 5
+  notes: Unfiltered complaints from people running your exact delivery stack.
+
+- name: r/msp
+  type: reddit
+  url: https://www.reddit.com/r/msp/new.json?limit=50
+  weight: 0.6
+  section_hint: business
+  min_score: 10
+  notes: Managed service providers = your competitors and your buyers.
+
+- name: The Register AI
+  type: rss
+  url: https://www.theregister.com/software/ai_ml/headlines.atom
+  weight: 0.7
+  section_hint: crisis
+  notes: Reliably skeptical. Good crisis-section counterweight to vendor feeds.
