@@ -70,7 +70,7 @@ def send_email():
             
         total_items = sum(
             len(synthesized_data.get(sec, []))
-            for sec in ["launches", "prompting_and_technique", "head_to_head", "tech_shifts", "repo_radar", "articles"]
+            for sec in ["launches", "prompting_and_technique", "head_to_head", "tech_shifts", "repo_radar", "business_ai", "senior_engineer", "articles"]
         )
         if total_items == 0:
             print("CRITICAL ERROR: Synthesized newsletter contains zero items. Refusing to send empty email.")
@@ -94,10 +94,10 @@ def send_email():
         
     print(f"Preparing newsletter email for {len(recipients)} recipient(s): {', '.join(recipients)}...")
     
-    # Build Subject using Asia/Kolkata date (Defect A5)
+    # Build Subject using Asia/Kolkata date
     kolkata_now = datetime.now(ZoneInfo("Asia/Kolkata"))
     formatted_date = f"{kolkata_now.day} {kolkata_now.strftime('%b %Y')}"
-    subject_title = f"Daily Tech Brief — {formatted_date}"
+    subject_title = f"repobuilt // Daily Tech & Engineering Brief — {formatted_date}"
     
     try:
         # Connect once to Gmail SMTP Server
@@ -110,7 +110,7 @@ def send_email():
         for recipient in recipients:
             msg = MIMEMultipart("alternative")
             msg["Subject"] = subject_title
-            msg["From"] = f"BUILDR.ai Daily Brief <{smtp_email}>"
+            msg["From"] = f"repobuilt <{smtp_email}>"
             msg["To"] = recipient
             
             part = MIMEText(html_content, "html")

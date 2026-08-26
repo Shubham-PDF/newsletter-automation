@@ -313,3 +313,57 @@
   notes: 'Disabled by verify_sources.py on 2026-08-06 10:34 UTC: Parsed 0 entries
     from RSS feed'
   enabled: false
+- name: The Pragmatic Engineer
+  type: rss
+  url: https://blog.pragmaticengineer.com/rss/
+  weight: 0.9
+  section_hint: senior_engineer
+  notes: Production engineering wisdom, industry practices, and career advice for senior engineers.
+- name: ByteByteGo
+  type: rss
+  url: https://blog.bytebytego.com/feed
+  weight: 0.9
+  section_hint: senior_engineer
+  notes: System design deep dives with practical production lessons.
+- name: High Scalability
+  type: rss
+  url: https://highscalability.com/feed/
+  weight: 0.8
+  section_hint: senior_engineer
+  notes: Architecture and scalability war stories from real systems.
+- name: Engineering at Meta
+  type: rss
+  url: https://engineering.fb.com/feed/
+  weight: 0.8
+  section_hint: senior_engineer
+  notes: Production engineering posts from Meta's infrastructure teams.
+- name: Netflix Tech Blog
+  type: rss
+  url: https://netflixtechblog.com/feed
+  weight: 0.8
+  section_hint: senior_engineer
+  notes: Streaming infrastructure, resilience engineering, and platform engineering at scale.
+- name: Uber Engineering Blog
+  type: rss
+  url: https://www.uber.com/en-US/blog/engineering/rss/
+  weight: 0.8
+  section_hint: senior_engineer
+  notes: Real-time systems, payments, and microservices at massive scale.
+- name: Stripe Engineering Blog
+  type: rss
+  url: https://stripe.com/blog/feed.rss
+  weight: 0.8
+  section_hint: senior_engineer
+  notes: Payment systems, API design, and reliability engineering.
+- name: AI Business
+  type: rss
+  url: https://aibusiness.com/rss.xml
+  weight: 0.8
+  section_hint: business_ai
+  notes: Dedicated coverage of enterprise AI adoption, deployments, and business strategy.
+- name: MIT Sloan Management Review
+  type: rss
+  url: https://sloanreview.mit.edu/feed/
+  weight: 0.7
+  section_hint: business_ai
+  notes: Strategic AI adoption analysis and management perspectives on AI transformation.

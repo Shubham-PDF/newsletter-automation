@@ -2,6 +2,7 @@
 import os
 import sys
 import json
+import re
 import requests
 import random
 from datetime import datetime, timedelta, timezone
@@ -78,7 +79,7 @@ def record_featured_history(synthesized_data):
             
     # 2. Featured article URLs
     featured_urls = []
-    for sec_name in ["launches", "prompting_and_technique", "head_to_head", "tech_shifts"]:
+    for sec_name in ["launches", "prompting_and_technique", "head_to_head", "tech_shifts", "business_ai", "senior_engineer"]:
         for item in synthesized_data.get(sec_name, []):
             url = item.get("url")
             if url:
@@ -176,12 +177,12 @@ def synthesize_newsletter():
     scraped_candidates = []
     for idx, c in enumerate(selected_news):
         print(f"[{idx+1}/{len(selected_news)}] Scraping news candidate: {c['title']} ({c['source']})")
-        full_text = scrape_article_text(c["url"], c["description"])
+        full_text = scrape_article_text(c["url"], c.get("summary", ""))
         scraped_candidates.append({
             "title": c["title"],
             "url": c["url"],
             "source": c["source"],
-            "time": c["time"],
+            "time": c.get("published_at", ""),
             "scraped_content": full_text[:3000]
         })
         
@@ -207,23 +208,59 @@ def synthesize_newsletter():
         for r in llm_repo_candidates
     ]
 
-    print("Initiating Perplexity AI research & synthesis across 5 sections...")
+    print("Initiating Perplexity AI research & synthesis across 7 sections...")
 
     prompt = f"""
-You are an expert technical newsletter editor compiling BUILDR.ai for software engineers and systems builders.
+You are an expert technical newsletter editor compiling repobuilt for software engineers and systems builders.
 
+═══════════════════════════════════════════════════
 HARD CONSTRAINT ON NEWS RECENCY:
+═══════════════════════════════════════════════════
 - Select news, releases, research, and technical shifts strictly published within the last 24 hours.
 - DO NOT include any story, product release, benchmark, or article that is 2 or more days old.
 
-Your newsletter MUST be organized into five exact sections:
-1. "launches": New AI models, tools, products, APIs, and notable version releases from the last 24 hours. State what specific task each is for.
-2. "prompting_and_technique": Practical, applicable techniques for getting better results out of models. Concrete patterns, not theory.
-3. "head_to_head": Comparisons between models or tools (benchmarks, pricing, context limits, real-world tradeoffs, "use X when Y").
-4. "tech_shifts": Broader infrastructure changes, deprecations, pricing moves, or platform regulations with practical impact from the last 24 hours.
-5. "repo_radar": 3 to 4 open-source developer repositories selected ONLY from the provided candidate repo list.
+═══════════════════════════════════════════════════
+ABSOLUTE DEDUPLICATION RULE (CRITICAL):
+═══════════════════════════════════════════════════
+- Each news item URL MUST appear in EXACTLY ONE section. Never reuse the same URL across multiple sections.
+- Each news story/topic MUST appear in EXACTLY ONE section. If a story is relevant to multiple sections, place it ONLY in the single MOST fitting section.
+- Every item across the entire newsletter must be about a DIFFERENT story, announcement, product, or event. No two items anywhere in the newsletter should cover the same thing, even with different angles.
+- If you find yourself writing about the same product/model/company in two sections, STOP and keep only the one in the best-fitting section.
 
+═══════════════════════════════════════════════════
+QUALITY & ANTI-FLUFF RULES:
+═══════════════════════════════════════════════════
+- Each item must be genuinely informative. Major announcements (e.g., Apple announces WWDC, Google launches a new API) are absolutely valid and should be included.
+- What to DROP: low-effort rehashes where multiple outlets paraphrase the same press release with zero added context — pick ONE source for that story and include the best-written version.
+- Never include generic filler content that says nothing specific. Every item must have at least one concrete detail: a date, a version number, a benchmark, a pricing change, a company name, a technical decision, or a specific feature.
+- "AI is transforming the industry" is fluff. "Apple announced WWDC 2026 for September 9 with new Siri SDK sessions" is a valid announcement.
+- No more than 2 items from the same original source across the ENTIRE newsletter.
+
+═══════════════════════════════════════════════════
+SECTIONS (7 total — each item in exactly ONE):
+═══════════════════════════════════════════════════
+
+1. "launches" (3-5 items): New AI models, tools, products, APIs, and notable version releases from the last 24 hours. State what specific task each is for. Include major tech announcements.
+
+2. "prompting_and_technique" (2-3 items): Practical, applicable techniques for getting better results out of models. Concrete patterns, not theory. Must include a usable example.
+
+3. "head_to_head" (1-2 items): Comparisons between models or tools — benchmarks, pricing, context limits, real-world tradeoffs, "use X when Y". Must compare at least 2 specific named products.
+
+4. "tech_shifts" (2-3 items): Broader infrastructure changes, deprecations, pricing moves, platform regulations, or significant outages/incidents with practical impact from the last 24 hours.
+
+5. "repo_radar" (3-4 items): Open-source developer repositories selected ONLY from the provided candidate repo list.
+
+6. "business_ai" (2-3 items): Real-world AI adoption and business moves. What specific companies are DEPLOYING in production, how they're using AI, funding rounds for AI startups, enterprise AI strategy shifts, and concrete ROI or impact numbers. NOT product launches (those go in section 1). Focus on: "Company X deployed Y to do Z and saw W% improvement" or "Company X raised $Y to build Z". This section should answer: "What are businesses actually doing with AI right now?"
+
+7. "senior_engineer" (2-3 items): Production engineering wisdom and battle-tested practices. Each item MUST be a CONCRETE, ACTIONABLE lesson from real production systems. Examples of the level of specificity required:
+   - "If you're using Redis for session storage, always set maxmemory-policy to allkeys-lru or you'll get OOM kills at 3 AM"
+   - "When integrating Razorpay webhooks, always verify the X-Razorpay-Signature header before processing — unsigned events are a replay attack vector"
+   - "PostgreSQL VACUUM can lock your table for minutes if you have 100M+ dead tuples — run pg_repack instead"
+   Each item must feel like it came from someone who learned the hard way in production. Topics can include: database operations, caching strategies, payment integrations, session management, deployment pipelines, monitoring/alerting, API design pitfalls, security gotchas, scaling bottlenecks, or incident response patterns.
+
+═══════════════════════════════════════════════════
 STRICT INSTRUCTIONS FOR REPO RADAR:
+═══════════════════════════════════════════════════
 - You may ONLY feature repositories present in the provided Repository Candidate List below.
 - Do NOT invent, guess, or modify any full_name, html_url, or star count.
 - Copy full_name, html_url, stars, and language verbatim from the candidate object.
@@ -333,9 +370,41 @@ Repository Candidate List (for repo_radar ONLY):
                     },
                     "required": ["full_name", "html_url", "stars", "language", "what_it_does", "daily_use_case", "getting_started"]
                 }
+            },
+            "business_ai": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "title": {"type": "string"},
+                        "url": {"type": "string"},
+                        "source": {"type": "string"},
+                        "company": {"type": "string"},
+                        "what_they_did": {"type": "string"},
+                        "business_impact": {"type": "string"},
+                        "takeaway_for_builders": {"type": "string"}
+                    },
+                    "required": ["title", "url", "source", "company", "what_they_did", "business_impact", "takeaway_for_builders"]
+                }
+            },
+            "senior_engineer": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "title": {"type": "string"},
+                        "url": {"type": "string"},
+                        "source": {"type": "string"},
+                        "topic_area": {"type": "string"},
+                        "the_lesson": {"type": "string"},
+                        "why_it_bites": {"type": "string"},
+                        "the_fix": {"type": "string"}
+                    },
+                    "required": ["title", "url", "source", "topic_area", "the_lesson", "why_it_bites", "the_fix"]
+                }
             }
         },
-        "required": ["launches", "prompting_and_technique", "head_to_head", "tech_shifts", "repo_radar"]
+        "required": ["launches", "prompting_and_technique", "head_to_head", "tech_shifts", "repo_radar", "business_ai", "senior_engineer"]
     }
 
     payload = {
@@ -343,7 +412,7 @@ Repository Candidate List (for repo_radar ONLY):
         "messages": [
             {
                 "role": "system",
-                "content": "You are an expert developer newsletter compiler. Respond strictly with valid JSON conforming to the requested schema. No marketing talk."
+                "content": "You are an expert developer newsletter compiler. You produce 7 distinct sections of a technical newsletter. Respond strictly with valid JSON conforming to the requested schema. No marketing talk. CRITICAL: Never place the same story, URL, or topic in more than one section."
             },
             {
                 "role": "user",
@@ -354,7 +423,7 @@ Repository Candidate List (for repo_radar ONLY):
         "response_format": {
             "type": "json_schema",
             "json_schema": {
-                "name": "newsletter_5_sections_schema",
+                "name": "newsletter_7_sections_schema",
                 "schema": schema
             }
         }
@@ -400,11 +469,56 @@ Repository Candidate List (for repo_radar ONLY):
             
     result_json["repo_radar"] = validated_repo_radar
 
-    # Count total items across all 5 sections
-    total_items = sum(len(result_json.get(sec, [])) for sec in ["launches", "prompting_and_technique", "head_to_head", "tech_shifts", "repo_radar"])
+    # ═══ POST-PROCESSING DEDUPLICATION ═══
+    # Even with prompt-level dedup rules, LLMs sometimes repeat the same story
+    # across sections. This pass catches duplicates by URL and fuzzy title match.
+    ALL_SECTIONS = ["launches", "prompting_and_technique", "head_to_head", "tech_shifts", "business_ai", "senior_engineer"]
+    seen_urls = set()
+    seen_titles = set()
+    dedup_removed = 0
+
+    def _normalize_title(t):
+        """Normalize title for fuzzy matching: lowercase, strip punctuation, collapse whitespace."""
+        t = re.sub(r'[^a-z0-9\s]', '', (t or '').lower())
+        return re.sub(r'\s+', ' ', t).strip()
+
+    for sec_name in ALL_SECTIONS:
+        items = result_json.get(sec_name, [])
+        deduped = []
+        for item in items:
+            url = (item.get("url") or "").strip().rstrip("/")
+            title_norm = _normalize_title(item.get("title", ""))
+            
+            if url and url in seen_urls:
+                print(f"  [dedup] Removed duplicate URL in '{sec_name}': {item.get('title', '')[:60]}")
+                dedup_removed += 1
+                continue
+            if title_norm and len(title_norm) > 10 and title_norm in seen_titles:
+                print(f"  [dedup] Removed duplicate title in '{sec_name}': {item.get('title', '')[:60]}")
+                dedup_removed += 1
+                continue
+            
+            if url:
+                seen_urls.add(url)
+            if title_norm and len(title_norm) > 10:
+                seen_titles.add(title_norm)
+            deduped.append(item)
+        result_json[sec_name] = deduped
+
+    if dedup_removed > 0:
+        print(f"  [dedup] Removed {dedup_removed} duplicate items across sections.")
+
+    # Also add repo URLs to seen set (repos use html_url, not url)
+    for repo in result_json.get("repo_radar", []):
+        repo_url = (repo.get("html_url") or "").strip().rstrip("/")
+        if repo_url:
+            seen_urls.add(repo_url)
+
+    # Count total items across all 7 sections
+    total_items = sum(len(result_json.get(sec, [])) for sec in ALL_SECTIONS + ["repo_radar"])
     
     if total_items == 0:
-        print("CRITICAL ERROR: AI synthesis returned zero total items across all 5 sections.")
+        print("CRITICAL ERROR: AI synthesis returned zero total items across all 7 sections.")
         sys.exit(1)
 
     # Save output to .tmp/synthesized_news.json
