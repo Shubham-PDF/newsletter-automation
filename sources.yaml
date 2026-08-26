@@ -348,7 +348,8 @@
   url: https://www.uber.com/en-US/blog/engineering/rss/
   weight: 0.8
   section_hint: senior_engineer
-  notes: Real-time systems, payments, and microservices at massive scale.
+  enabled: false
+  notes: 'Disabled: HTTP 406 from Cloudflare'
 - name: Stripe Engineering Blog
   type: rss
   url: https://stripe.com/blog/feed.rss
