@@ -398,11 +398,15 @@ async def fetch_and_filter_news(store: Store, manifest: Manifest) -> List[Item]:
         source_weight = float(src.get("weight", 0.6))
         
         score = relevance_score(title, summary)
-        # Apply small weight bonus for high-authority sources
-        if source_weight >= 0.9:
+        # Apply source weight bonus: higher weight sources need lower raw match
+        if source_weight >= 0.8:
             score += 1.5
+        elif source_weight >= 0.6:
+            score += 0.5
 
-        if score < 3.0 and src.get("type") not in ("openrouter", "gh_releases"):
+        # Section-specific threshold: openrouter and gh_releases bypass, others require >= 2.0
+        min_threshold = 1.5 if src.get("section_hint") in ("business_ai", "senior_engineer", "business") else 2.0
+        if score < min_threshold and src.get("type") not in ("openrouter", "gh_releases"):
             manifest.record_rejection(source_name, "low_score")
             continue
 

@@ -148,7 +148,7 @@ def within_window(dt: Optional[datetime], max_hours: int = 30) -> Tuple[bool, st
 POSITIVE_HIGH = [
     r'\bllm\b', r'\bllms\b', r'\bgpt-?\d*\b', r'\bclaude\b', r'\bgemini\b',
     r'\bllama\b', r'\bmistral\b', r'\bdeepseek\b', r'\bqwen\b', r'\bvllm\b',
-    r'\bsglang\b', r'\bollama\b', r'\blitellm\b'
+    r'\bsglang\b', r'\bollama\b', r'\blitellm\b', r'\bopenai\b', r'\banthropic\b'
 ]
 
 POSITIVE_MED = [
@@ -157,14 +157,18 @@ POSITIVE_MED = [
     r'\bevals\b', r'\bbenchmark\b', r'\bbenchmarks\b', r'\bcontext window\b',
     r'\blangchain\b', r'\blanggraph\b', r'\bllamaindex\b', r'\bcrewai\b',
     r'\bpydantic-ai\b', r'\bautogen\b', r'\bdspy\b', r'\bunsloth\b', r'\bn8n\b',
-    r'\btemporal\b', r'\blangfuse\b'
+    r'\btemporal\b', r'\blangfuse\b', r'\bproduction\b', r'\barchitecture\b',
+    r'\bscaling\b', r'\bdatabase\b', r'\bpostgres\b', r'\bredis\b', r'\bwebhook\b',
+    r'\bdeploy\b', r'\bdeployment\b', r'\bincident\b', r'\boutage\b', r'\benterprise\b'
 ]
 
 POSITIVE_LOW = [
     r'\bai\b', r'\bml\b', r'\blaunch\b', r'\blaunches\b', r'\brelease\b',
     r'\breleases\b', r'\bv\d+\.\d+\b', r'\bpricing\b', r'\bopen-source\b',
     r'\bweights\b', r'\binference\b', r'\bsdk\b', r'\bapi\b', r'\bapis\b',
-    r'\bpython\b', r'\btypescript\b', r'\brust\b', r'\bdevtools\b'
+    r'\bpython\b', r'\btypescript\b', r'\brust\b', r'\bdevtools\b',
+    r'\bengineering\b', r'\bperformance\b', r'\bstartup\b', r'\bfunding\b',
+    r'\bsecurity\b', r'\bcloud\b', r'\binfrastructure\b', r'\bautomation\b'
 ]
 
 NEGATIVE_PATTERNS = [

@@ -153,21 +153,18 @@ def synthesize_newsletter():
         print("CRITICAL ERROR: PERPLEXITY_API_KEY environment variable is not configured or empty.")
         sys.exit(1)
 
-    if not os.path.exists(RAW_NEWS_FILE):
-        print(f"CRITICAL ERROR: {RAW_NEWS_FILE} not found. Run fetch_news.py first.")
-        sys.exit(1)
-        
-    with open(RAW_NEWS_FILE, "r", encoding="utf-8") as f:
-        articles = json.load(f)
-        
-    if not articles:
-        print("CRITICAL ERROR: No raw news articles fetched from fetch_news.py.")
-        sys.exit(1)
+    articles = []
+    if os.path.exists(RAW_NEWS_FILE):
+        try:
+            with open(RAW_NEWS_FILE, "r", encoding="utf-8") as f:
+                articles = json.load(f)
+        except Exception:
+            articles = []
         
     # Filter out recently featured articles
     recent_articles = load_recently_featured_articles(days=30)
     unseen_articles = [a for a in articles if a.get("url") not in recent_articles]
-    if not unseen_articles:
+    if not unseen_articles and articles:
         unseen_articles = articles # Fallback if all are seen
         
     # Deterministic ranking for top 15 news candidates
