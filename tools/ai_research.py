@@ -25,8 +25,20 @@ FEATURED_ARTICLES_FILE = os.path.join(HISTORY_DIR, "featured_articles.json")
 os.makedirs(TMP_DIR, exist_ok=True)
 os.makedirs(HISTORY_DIR, exist_ok=True)
 
-# Configure Perplexity API
-API_KEY = os.getenv("PERPLEXITY_API_KEY")
+# Configure API Credentials (support OpenRouter with fallback to Perplexity)
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+PERPLEXITY_API_KEY = os.getenv("PERPLEXITY_API_KEY")
+
+API_KEY = OPENROUTER_API_KEY or PERPLEXITY_API_KEY
+if OPENROUTER_API_KEY:
+    API_URL = "https://openrouter.ai/api/v1/chat/completions"
+    DEFAULT_MODEL = os.getenv("OPENROUTER_MODEL", "perplexity/sonar")
+    PROVIDER_NAME = "OpenRouter"
+else:
+    API_URL = "https://api.perplexity.ai/chat/completions"
+    DEFAULT_MODEL = os.getenv("PERPLEXITY_MODEL", "sonar")
+    PROVIDER_NAME = "Perplexity"
+
 
 def load_recently_featured_articles(days=30):
     if not os.path.exists(FEATURED_ARTICLES_FILE):
@@ -150,7 +162,7 @@ def calculate_candidate_score(item):
 def synthesize_newsletter():
     # Strict API key check
     if not API_KEY:
-        print("CRITICAL ERROR: PERPLEXITY_API_KEY environment variable is not configured or empty.")
+        print("CRITICAL ERROR: OPENROUTER_API_KEY (or PERPLEXITY_API_KEY) environment variable is not configured or empty.")
         sys.exit(1)
 
     articles = []
@@ -205,7 +217,7 @@ def synthesize_newsletter():
         for r in llm_repo_candidates
     ]
 
-    print("Initiating Perplexity AI research & synthesis across 7 sections...")
+    print(f"Initiating AI research & synthesis via {PROVIDER_NAME} ({DEFAULT_MODEL}) across 7 sections...")
 
     prompt = f"""
 You are an expert technical newsletter editor compiling repobuilt for software engineers and systems builders.
@@ -285,6 +297,9 @@ Repository Candidate List (for repo_radar ONLY):
         "Authorization": f"Bearer {API_KEY}",
         "Content-Type": "application/json"
     }
+    if OPENROUTER_API_KEY:
+        headers["HTTP-Referer"] = "https://github.com/BUILDR-ai/Newsletter"
+        headers["X-Title"] = "BUILDR.ai Newsletter"
 
     schema = {
         "type": "object",
@@ -405,7 +420,7 @@ Repository Candidate List (for repo_radar ONLY):
     }
 
     payload = {
-        "model": "sonar",
+        "model": DEFAULT_MODEL,
         "messages": [
             {
                 "role": "system",
@@ -428,21 +443,27 @@ Repository Candidate List (for repo_radar ONLY):
 
     try:
         response = requests.post(
-            "https://api.perplexity.ai/chat/completions",
+            API_URL,
             headers=headers,
             json=payload,
-            timeout=90
+            timeout=120
         )
         if response.status_code != 200:
-            print(f"CRITICAL ERROR: Perplexity API returned status {response.status_code}: {response.text}")
+            print(f"CRITICAL ERROR: {PROVIDER_NAME} API returned status {response.status_code}: {response.text}")
             sys.exit(1)
             
         response_data = response.json()
-        raw_content = response_data["choices"][0]["message"]["content"]
+        raw_content = response_data["choices"][0]["message"]["content"].strip()
+        
+        # Strip code fences if model wrapped output in ```json ... ```
+        if raw_content.startswith("```"):
+            raw_content = re.sub(r"^```(?:json)?\s*", "", raw_content)
+            raw_content = re.sub(r"\s*```$", "", raw_content)
+            
         result_json = json.loads(raw_content)
         
     except Exception as e:
-        print(f"CRITICAL ERROR during Perplexity AI synthesis: {e}")
+        print(f"CRITICAL ERROR during AI synthesis: {e}")
         sys.exit(1)
         
     # Post-process & validate Repo Radar entries against original fetched candidate data

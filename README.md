@@ -19,7 +19,7 @@ Most technical newsletters are either hand-curated (lagging behind) or fully aut
 5. **Repo Radar** — High-signal open-source developer repositories and CLI tools fetched directly via the GitHub REST API, complete with star counts, language tags, real-world use cases, and getting started commands.
 
 ### Core Architecture Features
-- **Search-Grounded AI Synthesis**: Leverages the **Perplexity API (`sonar`)** to conduct real-time web searches alongside parsed feeds, verifying facts and pulling in breaking news from the last 24 hours.
+- **Search-Grounded AI Synthesis**: Leverages **OpenRouter (`perplexity/sonar`)** (with fallback to direct Perplexity API) to conduct real-time web searches alongside parsed feeds, verifying facts and pulling in breaking news from the last 24 hours.
 - **GitHub REST Search & Repo Radar**: Automatically queries trending AI/LLM repos and developer productivity tools, enforcing a 60-day history exclusion window (`history/featured_repos.json`).
 - **Strict Error Safety**: Fails non-zero immediately on missing API keys, network failures, or empty responses, preventing blank emails from ever being dispatched.
 - **No Hallucinated Links**: Copies exact, verified URLs and repository star counts—no broken links or fabricated metadata.
