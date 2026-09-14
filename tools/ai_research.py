@@ -26,18 +26,19 @@ os.makedirs(TMP_DIR, exist_ok=True)
 os.makedirs(HISTORY_DIR, exist_ok=True)
 
 # Configure API Credentials (support OpenRouter with fallback to Perplexity)
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
-PERPLEXITY_API_KEY = os.getenv("PERPLEXITY_API_KEY")
+OPENROUTER_API_KEY = (os.getenv("OPENROUTER_API_KEY") or "").strip().strip("'\"")
+PERPLEXITY_API_KEY = (os.getenv("PERPLEXITY_API_KEY") or "").strip().strip("'\"")
 
 API_KEY = OPENROUTER_API_KEY or PERPLEXITY_API_KEY
 if OPENROUTER_API_KEY:
     API_URL = "https://openrouter.ai/api/v1/chat/completions"
-    DEFAULT_MODEL = os.getenv("OPENROUTER_MODEL", "perplexity/sonar")
+    DEFAULT_MODEL = os.getenv("OPENROUTER_MODEL", "perplexity/sonar").strip().strip("'\"")
     PROVIDER_NAME = "OpenRouter"
 else:
     API_URL = "https://api.perplexity.ai/chat/completions"
-    DEFAULT_MODEL = os.getenv("PERPLEXITY_MODEL", "sonar")
+    DEFAULT_MODEL = os.getenv("PERPLEXITY_MODEL", "sonar").strip().strip("'\"")
     PROVIDER_NAME = "Perplexity"
+
 
 
 def load_recently_featured_articles(days=30):
