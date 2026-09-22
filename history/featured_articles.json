@@ -310,5 +310,53 @@
   {
     "url": "https://www.theverge.com/science/997834/ai-cyberattack-energy-critical-infrastructure",
     "date": "2026-09-21"
+  },
+  {
+    "url": "https://huggingface.co/XiaomiMiMo/MiMo-V2.6-Pro-RL",
+    "date": "2026-09-22"
+  },
+  {
+    "url": "https://huggingface.co/XiaomiMiMo/MiMo-V2.6-Distill-Qwen-9B",
+    "date": "2026-09-22"
+  },
+  {
+    "url": "https://huggingface.co/abenzerps/Qwen-Image-2.1-GGUF",
+    "date": "2026-09-22"
+  },
+  {
+    "url": "https://openai.com/index/expanding-openai-academy-with-new-learning-paths",
+    "date": "2026-09-22"
+  },
+  {
+    "url": "https://simonwillison.net/2026/Sep/21/jev/",
+    "date": "2026-09-22"
+  },
+  {
+    "url": "https://openai.com/index/higgsfield-from-prompt-to-production-with-astra",
+    "date": "2026-09-22"
+  },
+  {
+    "url": "https://openai.com/index/building-standards-next-phase-ai",
+    "date": "2026-09-22"
+  },
+  {
+    "url": "https://openai.com/index/advisory-group-on-mathematics-and-ai",
+    "date": "2026-09-22"
+  },
+  {
+    "url": "https://techcrunch.com/2026/09/21/metas-ai-agent-has-been-blocked-from-using-amazon-com/",
+    "date": "2026-09-22"
+  },
+  {
+    "url": "https://techcrunch.com/2026/09/21/with-tabby-a-former-accountant-is-using-ai-to-make-accountants-obsolete/",
+    "date": "2026-09-22"
+  },
+  {
+    "url": "https://techcrunch.com/2026/09/21/metas-muse-is-outpacing-chatgpts-early-mobile-launch/",
+    "date": "2026-09-22"
+  },
+  {
+    "url": "https://huggingface.co/blog/MultiverseComputingCAI/pruning-llms-like-a-physicist-block-removal-as-an",
+    "date": "2026-09-22"
   }
 ]
