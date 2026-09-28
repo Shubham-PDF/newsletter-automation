@@ -2,8 +2,8 @@ name: Daily Technical Newsletter
 
 on:
   schedule:
-    # 2:30 AM UTC (02:30 UTC = 8:00 AM IST)
-    - cron: '7 2 * * *'
+    - cron: '17 8 * * *'
+      timezone: 'Asia/Kolkata'
   workflow_dispatch: # Allows manual trigger from GitHub UI
 
 jobs:
