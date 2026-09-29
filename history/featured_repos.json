@@ -254,5 +254,21 @@
   {
     "full_name": "fastlane/fastlane",
     "date": "2026-09-28"
+  },
+  {
+    "full_name": "hypit-ai/hypit",
+    "date": "2026-09-29"
+  },
+  {
+    "full_name": "feder-cr/invisible_playwright_mcp",
+    "date": "2026-09-29"
+  },
+  {
+    "full_name": "tabtin-ai/TabTin",
+    "date": "2026-09-29"
+  },
+  {
+    "full_name": "louislam/uptime-kuma",
+    "date": "2026-09-29"
   }
 ]
