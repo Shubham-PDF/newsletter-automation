@@ -658,5 +658,45 @@
   {
     "url": "https://status.openai.com//incidents/01M3R1T4FCR1337FBBYY9K2RPB",
     "date": "2026-09-30"
+  },
+  {
+    "url": "https://techcrunch.com/2026/09/30/google-releases-gemini-4-argon-called-its-most-powerful-model-yet/",
+    "date": "2026-10-01"
+  },
+  {
+    "url": "https://techcrunch.com/2026/09/30/doordash-launches-an-ai-agent-you-can-text-to-order-food/",
+    "date": "2026-10-01"
+  },
+  {
+    "url": "https://techcrunch.com/2026/09/30/openais-jev-clone-could-help-the-frontier-lab-stop-its-swarming-agents/",
+    "date": "2026-10-01"
+  },
+  {
+    "url": "https://openai.com/index/helping-small-businesses-put-ai-to-work",
+    "date": "2026-10-01"
+  },
+  {
+    "url": "https://techcrunch.com/2026/09/30/reddit-is-killing-rss-feeds-ending-public-api-access-because-of-ai-bots/",
+    "date": "2026-10-01"
+  },
+  {
+    "url": "https://openai.com/index/disrupting-a-coordinated-model-distillation-campaign",
+    "date": "2026-10-01"
+  },
+  {
+    "url": "https://status.openai.com//incidents/01M3SMF1Q0TDCQVNYSXYG37QMR",
+    "date": "2026-10-01"
+  },
+  {
+    "url": "https://techcrunch.com/2026/09/30/ai-voice-startup-elevenlabs-doubles-valuation-to-22b/",
+    "date": "2026-10-01"
+  },
+  {
+    "url": "https://techcrunch.com/2026/09/30/valor-atreides-and-sequoia-back-ai-startup-flow-engineering-at-750m-valuation/",
+    "date": "2026-10-01"
+  },
+  {
+    "url": "https://techcrunch.com/2026/09/30/destro-ais-secret-sauce-is-getting-robots-and-humans-on-the-same-page/",
+    "date": "2026-10-01"
   }
 ]
