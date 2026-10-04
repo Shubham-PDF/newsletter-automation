@@ -778,5 +778,45 @@
   {
     "url": "https://techcrunch.com/2026/10/02/circuit-breaker-labs-hopes-to-make-ai-safer-for-your-kids-and-you/",
     "date": "2026-10-03"
+  },
+  {
+    "url": "https://huggingface.co/Qwen/Qwen3.8-Flash-Next",
+    "date": "2026-10-04"
+  },
+  {
+    "url": "https://www.marktechpost.com/2026/10/03/deepseek-harness-v0-2-brings-official-desktop-apps-to-its-open-source-agent-harness/",
+    "date": "2026-10-04"
+  },
+  {
+    "url": "https://github.com/BerriAI/litellm/releases/tag/v1.104.0",
+    "date": "2026-10-04"
+  },
+  {
+    "url": "https://github.com/PostHog/posthog/releases/tag/agent-skills-v0.2531.0",
+    "date": "2026-10-04"
+  },
+  {
+    "url": "https://huggingface.co/blog/microsoft/thinkingbox",
+    "date": "2026-10-04"
+  },
+  {
+    "url": "https://simonwillison.net/2026/Oct/3/default-hard-budget-caps/",
+    "date": "2026-10-04"
+  },
+  {
+    "url": "https://www.marktechpost.com/2026/10/03/meta-openai-and-uber-just-taught-ai-agents-to-talk-first-what-about-when-to-stay-quiet/",
+    "date": "2026-10-04"
+  },
+  {
+    "url": "https://www.techmeme.com/261004/p5#a261004p5",
+    "date": "2026-10-04"
+  },
+  {
+    "url": "https://www.techmeme.com/261004/p2#a261004p2",
+    "date": "2026-10-04"
+  },
+  {
+    "url": "https://www.techmeme.com/261004/p6#a261004p6",
+    "date": "2026-10-04"
   }
 ]

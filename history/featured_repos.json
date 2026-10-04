@@ -334,5 +334,17 @@
   {
     "full_name": "immich-app/immich",
     "date": "2026-10-03"
+  },
+  {
+    "full_name": "huginn/huginn",
+    "date": "2026-10-04"
+  },
+  {
+    "full_name": "apache/airflow",
+    "date": "2026-10-04"
+  },
+  {
+    "full_name": "ohmyzsh/ohmyzsh",
+    "date": "2026-10-04"
   }
 ]
