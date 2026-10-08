@@ -946,5 +946,53 @@
   {
     "url": "https://status.openai.com//incidents/01M493CZ0CB14KPC0EER83MNVB",
     "date": "2026-10-07"
+  },
+  {
+    "url": "https://techcrunch.com/2026/10/07/chatgpt-is-getting-a-lot-more-visual-with-the-launch-of-a-new-interface/",
+    "date": "2026-10-08"
+  },
+  {
+    "url": "https://huggingface.co/unsloth/embeddinggemma-2-GGUF",
+    "date": "2026-10-08"
+  },
+  {
+    "url": "https://support.claude.com/en/articles/12138966-release-notes",
+    "date": "2026-10-08"
+  },
+  {
+    "url": "https://huggingface.co/blog/nvidia/nemotron-ioi-and-imo-2026",
+    "date": "2026-10-08"
+  },
+  {
+    "url": "https://openai.com/index/teens-learn-and-plan",
+    "date": "2026-10-08"
+  },
+  {
+    "url": "https://simonwillison.net/2026/Oct/7/claude-haiku-5-5/",
+    "date": "2026-10-08"
+  },
+  {
+    "url": "https://techcrunch.com/2026/10/07/microsoft-releases-new-nvidia-chip-ai-pcs-with-revamped-windows-11/",
+    "date": "2026-10-08"
+  },
+  {
+    "url": "https://openai.com/index/radisson",
+    "date": "2026-10-08"
+  },
+  {
+    "url": "https://techcrunch.com/2026/10/07/nous-research-confirms-it-hit-1-5b-valuation-launches-ai-agents-for-business-users/",
+    "date": "2026-10-08"
+  },
+  {
+    "url": "https://status.openai.com//incidents/01M4CBXZ62A9SVH8D74KVYQC8M",
+    "date": "2026-10-08"
+  },
+  {
+    "url": "https://status.openai.com//incidents/01M4BP5JE7DKJSP3VG2S2DCWF2",
+    "date": "2026-10-08"
+  },
+  {
+    "url": "https://techcrunch.com/2026/10/07/the-next-hurdle-for-ai-agents-getting-websites-to-let-them-in/",
+    "date": "2026-10-08"
   }
 ]
