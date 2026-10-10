@@ -1030,5 +1030,41 @@
   {
     "url": "https://techcrunch.com/2026/10/08/cal-ais-19-year-old-founder-just-raised-10m-for-his-new-ai-startup/",
     "date": "2026-10-09"
+  },
+  {
+    "url": "https://huggingface.co/Qwen/Qwen-Image-2.1-Turbo",
+    "date": "2026-10-10"
+  },
+  {
+    "url": "https://github.com/PostHog/posthog/releases/tag/agent-skills-v0.2868.0",
+    "date": "2026-10-10"
+  },
+  {
+    "url": "https://appleworld.today/2026/10/apple-releases-third-developer-betas-of-macos-27-2-ios-27-2-ipados-27-2-watchos-27-2-visionos-27-2-and-tvos-27-2/",
+    "date": "2026-10-10"
+  },
+  {
+    "url": "https://status.openai.com//incidents/01M4GV1M2A3K38T73JCVCD9G0R",
+    "date": "2026-10-10"
+  },
+  {
+    "url": "https://openai.com/index/asana-browser-agent",
+    "date": "2026-10-10"
+  },
+  {
+    "url": "https://legaltechnology.com/webinar-replay-legal-ai-has-a-trust-problem-is-disconnected-data-to-blame/",
+    "date": "2026-10-10"
+  },
+  {
+    "url": "https://techcrunch.com/2026/10/09/anthropic-cant-reliably-control-its-ai-agents-its-cutting-off-its-internal-evals-from-the-live-internet-instead/",
+    "date": "2026-10-10"
+  },
+  {
+    "url": "https://techcrunch.com/video/amazon-and-others-are-done-keeping-data-center-deals-secret-is-it-enough-to-build-trust/",
+    "date": "2026-10-10"
+  },
+  {
+    "url": "https://techcrunch.com/2026/10/09/the-maker-of-non-text-ai-model-jev-valued-at-7-5b-just-weeks-after-launch/",
+    "date": "2026-10-10"
   }
 ]
