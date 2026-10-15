@@ -1214,5 +1214,37 @@
   {
     "url": "https://openai.com/index/higgsfield-longer-videos-voice",
     "date": "2026-10-14"
+  },
+  {
+    "url": "https://huggingface.co/vllm-sr/d3",
+    "date": "2026-10-15"
+  },
+  {
+    "url": "https://status.openai.com//incidents/01M4WYPP5QA0CJ3JV76KH285K8",
+    "date": "2026-10-15"
+  },
+  {
+    "url": "https://status.openai.com//incidents/01M4XNQX7C6RCBNGX9H711WFSG",
+    "date": "2026-10-15"
+  },
+  {
+    "url": "https://developer.apple.com/news/releases/?id=09142026c",
+    "date": "2026-10-15"
+  },
+  {
+    "url": "https://nvidianews.nvidia.com/news",
+    "date": "2026-10-15"
+  },
+  {
+    "url": "https://openai.com/index/third-moment-research",
+    "date": "2026-10-15"
+  },
+  {
+    "url": "https://openai.com/index/block-ai-powered-security",
+    "date": "2026-10-15"
+  },
+  {
+    "url": "https://openai.com/index/sentinelone",
+    "date": "2026-10-15"
   }
 ]
