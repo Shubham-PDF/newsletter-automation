@@ -1574,5 +1574,45 @@
   {
     "url": "https://openai.com/index/scaling-storage-one-billion-users-part-two",
     "date": "2026-10-24"
+  },
+  {
+    "url": "https://huggingface.co/orcarouter/DeepSeek-V4.1-Flash-1017-abliterated-GGUF",
+    "date": "2026-10-25"
+  },
+  {
+    "url": "https://huggingface.co/ISTA-DASLab/DeepSeek-V4.1-Flash-1017-GSQ-RCO-GGUF",
+    "date": "2026-10-25"
+  },
+  {
+    "url": "https://github.com/modelcontextprotocol/servers/releases/tag/v2.1.0",
+    "date": "2026-10-25"
+  },
+  {
+    "url": "https://github.com/Arize-ai/phoenix/releases/tag/arize-phoenix-evals-v3.9.4",
+    "date": "2026-10-25"
+  },
+  {
+    "url": "https://techcrunch.com/2026/10/24/all-the-ai-agents-that-can-live-in-your-text-messages/",
+    "date": "2026-10-25"
+  },
+  {
+    "url": "https://techcrunch.com/2026/10/24/the-ai-graveyard-a-running-list-of-projects-and-startups-that-didnt-make-it/",
+    "date": "2026-10-25"
+  },
+  {
+    "url": "https://techcrunch.com/2026/10/24/forced-to-pick-groks-ai-model-chooses-republicans-openais-picks-democrats/",
+    "date": "2026-10-25"
+  },
+  {
+    "url": "https://www.marktechpost.com/2026/10/24/anthropic-sandbox-runtime-ai-agent-sandbox/",
+    "date": "2026-10-25"
+  },
+  {
+    "url": "https://www.techmeme.com/261025/p5#a261025p5",
+    "date": "2026-10-25"
+  },
+  {
+    "url": "https://www.thedailystar.net/news/technology/news/meta-launches-ai-agent-capable-accessing-other-apps-4269431",
+    "date": "2026-10-25"
   }
 ]
