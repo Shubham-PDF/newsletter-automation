@@ -1614,5 +1614,49 @@
   {
     "url": "https://www.thedailystar.net/news/technology/news/meta-launches-ai-agent-capable-accessing-other-apps-4269431",
     "date": "2026-10-25"
+  },
+  {
+    "url": "https://techcrunch.com/2026/10/25/the-hottest-ai-wearables-and-gadgets-you-should-know-about/",
+    "date": "2026-10-26"
+  },
+  {
+    "url": "https://github.com/BerriAI/litellm/releases/tag/v1.104.7",
+    "date": "2026-10-26"
+  },
+  {
+    "url": "https://github.com/BerriAI/litellm/releases/tag/v1.105.5",
+    "date": "2026-10-26"
+  },
+  {
+    "url": "https://techcrunch.com/2026/10/25/ai-delivers-zero-financial-payoff-to-most-companies-according-to-apollo-economist/",
+    "date": "2026-10-26"
+  },
+  {
+    "url": "https://techcrunch.com/2026/10/25/grok-releases-the-first-seven-minutes-of-its-ai-generated-odyssey/",
+    "date": "2026-10-26"
+  },
+  {
+    "url": "https://ground.news/article/claude-fable-51-and-mythos-51-anthropics-new-ai-frontier",
+    "date": "2026-10-26"
+  },
+  {
+    "url": "https://www.originbrief.app/en/reports/ai-industry-overview/2026-10-26/weekly",
+    "date": "2026-10-26"
+  },
+  {
+    "url": "https://ground.news/article/openai-anthropic-spacexai-hit-by-service-outages-for-ai-models_0544c6",
+    "date": "2026-10-26"
+  },
+  {
+    "url": "https://breachnews.com/cyber-attacks/railway-confirms-attacker-decrypted-customer-secrets-in-hunt-for-ai-api-keys/",
+    "date": "2026-10-26"
+  },
+  {
+    "url": "https://www.techmeme.com/261026/p4#a261026p4",
+    "date": "2026-10-26"
+  },
+  {
+    "url": "https://github.com/weaviate/weaviate/releases/tag/v1.37.18",
+    "date": "2026-10-26"
   }
 ]
