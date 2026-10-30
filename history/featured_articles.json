@@ -1778,5 +1778,57 @@
   {
     "url": "https://techcrunch.com/2026/10/28/anthropic-just-launched-tools-to-show-companies-what-their-ai-spending-is-buying/",
     "date": "2026-10-29"
+  },
+  {
+    "url": "https://huggingface.co/mistralai/Mistral-Large-4-1T-A52B",
+    "date": "2026-10-30"
+  },
+  {
+    "url": "https://huggingface.co/unsloth/NVIDIA-Nemotron-3.5-Bolt-E4B-GGUF",
+    "date": "2026-10-30"
+  },
+  {
+    "url": "https://techcrunch.com/2026/10/29/meta-quietly-launches-an-ai-fashion-app-called-style-sketch/",
+    "date": "2026-10-30"
+  },
+  {
+    "url": "https://techcrunch.com/2026/10/29/granola-crunches-up-a-dictation-feature-to-compete-with-wispr/",
+    "date": "2026-10-30"
+  },
+  {
+    "url": "https://techcrunch.com/2026/10/29/mistral-releases-weights-for-its-trillion-parameter-ai-model-targeting-cybersecurity/",
+    "date": "2026-10-30"
+  },
+  {
+    "url": "https://openai.com/index/how-we-detect-frontier-model-misalignment",
+    "date": "2026-10-30"
+  },
+  {
+    "url": "https://techcrunch.com/2026/10/29/aws-will-be-a-1t-business-jassy-says-but-first-it-will-spend-big/",
+    "date": "2026-10-30"
+  },
+  {
+    "url": "https://techcrunch.com/2026/10/29/as-search-traffic-dries-up-reddit-announces-its-shifting-to-a-logged-in-experience/",
+    "date": "2026-10-30"
+  },
+  {
+    "url": "https://openai.com/index/ropes-gray-ai-diligence",
+    "date": "2026-10-30"
+  },
+  {
+    "url": "https://techcrunch.com/2026/10/29/ex-palantir-execs-launch-dream-with-17m-from-a16z-to-build-ai-world-models-for-construction/",
+    "date": "2026-10-30"
+  },
+  {
+    "url": "https://techcrunch.com/2026/10/29/wabi-the-ai-agent-that-builds-mini-apps-now-valued-at-1-25b-after-latest-round/",
+    "date": "2026-10-30"
+  },
+  {
+    "url": "https://techcrunch.com/2026/10/29/rivian-expands-joint-venture-with-vw-to-include-ai-assistant/",
+    "date": "2026-10-30"
+  },
+  {
+    "url": "https://techcrunch.com/2026/10/29/you-dont-need-to-believe-in-a-god-to-get-a-religious-exemption-from-using-ai-at-work/",
+    "date": "2026-10-30"
   }
 ]
