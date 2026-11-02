@@ -494,5 +494,21 @@
   {
     "full_name": "langchain-ai/design-agent",
     "date": "2026-10-30"
+  },
+  {
+    "full_name": "phone-harness/phone-harness",
+    "date": "2026-11-02"
+  },
+  {
+    "full_name": "zhuyansen/new-term-radar",
+    "date": "2026-11-02"
+  },
+  {
+    "full_name": "sahenjp/RustXNG",
+    "date": "2026-11-02"
+  },
+  {
+    "full_name": "kajisho5/ffmpeg-skill",
+    "date": "2026-11-02"
   }
 ]
