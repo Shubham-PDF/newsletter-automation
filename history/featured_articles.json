@@ -2322,5 +2322,33 @@
   {
     "url": "https://github.com/BerriAI/litellm/releases/tag/v1.106.10",
     "date": "2026-11-14"
+  },
+  {
+    "url": "https://github.com/BerriAI/litellm/releases/tag/v1.108.9",
+    "date": "2026-11-15"
+  },
+  {
+    "url": "https://huggingface.co/higurashi-ai/Haru-4B",
+    "date": "2026-11-15"
+  },
+  {
+    "url": "https://huggingface.co/ConceptCountry/qwen-concept-27b",
+    "date": "2026-11-15"
+  },
+  {
+    "url": "https://aibriefs.news/briefing/2026-11-15",
+    "date": "2026-11-15"
+  },
+  {
+    "url": "https://www.infoq.com/news/2026/11/cohere-open-weight-egress-risk/?utm_campaign=infoq_content&utm_source=infoq&utm_medium=feed&utm_term=AI%2C+ML+%26+Data+Engineering-news",
+    "date": "2026-11-15"
+  },
+  {
+    "url": "https://ai.ftmq.com/story/at-t-expands-agentic-ai-deployment-with-500-workflows-currently-4f823f",
+    "date": "2026-11-15"
+  },
+  {
+    "url": "https://www.techmeme.com/261114/p16#a261114p16",
+    "date": "2026-11-15"
   }
 ]
