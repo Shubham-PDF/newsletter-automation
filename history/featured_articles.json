@@ -2786,5 +2786,41 @@
   {
     "url": "https://status.openai.com//incidents/01M89RGC3STKK2MT53TXHFMY4H",
     "date": "2026-11-26"
+  },
+  {
+    "url": "https://huggingface.co/blog/ggml-org/llamacpp-amd-bench",
+    "date": "2026-11-27"
+  },
+  {
+    "url": "https://github.com/n8n-io/n8n/releases/tag/stable",
+    "date": "2026-11-27"
+  },
+  {
+    "url": "https://github.com/n8n-io/n8n/releases/tag/n8n%402.50.3",
+    "date": "2026-11-27"
+  },
+  {
+    "url": "https://aws.amazon.com/about-aws/whats-new/2026/11/amazon-rds-postgresql-18-7-17-12-16-16-15-20-14-25/",
+    "date": "2026-11-27"
+  },
+  {
+    "url": "https://techcrunch.com/2026/11/26/nvidia-hits-pause-on-chip-shipments-to-southeast-asia/",
+    "date": "2026-11-27"
+  },
+  {
+    "url": "https://www.finextra.com/newsarticle/48822/bofe-says-firms-need-to-invest-to-keep-pace-with-ai-threat?utm_medium=rssfinextrafeed&utm_source=finextrafeed",
+    "date": "2026-11-27"
+  },
+  {
+    "url": "https://www.finextra.com/newsarticle/48824/shuttle-secures-fca-authorisation-to-help-startups-raise-capital-across-borders?utm_medium=rssfinextrafeed&utm_source=finextrafeed",
+    "date": "2026-11-27"
+  },
+  {
+    "url": "https://www.finextra.com/pressarticle/111794/credable-acquires-70-stake-in-reql?utm_medium=rssfinextrafeed&utm_source=finextrafeed",
+    "date": "2026-11-27"
+  },
+  {
+    "url": "https://www.marktechpost.com/2026/11/26/nexos-ai-ai-gateway-200-models-governance/",
+    "date": "2026-11-27"
   }
 ]
